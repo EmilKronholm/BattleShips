@@ -53,7 +53,12 @@ fun BattleShipsApp() {
         popEnterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
         popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
     ) {
-        composable(Routes.HOME){ HomeScreen(navController) }
-        composable(Routes.ENTER_NAME){ EnterNameScreen(navController) }
+        composable(Routes.HOME) { HomeScreen(navController) }
+        composable(Routes.ENTER_NAME) { EnterNameScreen(navController) }
+        composable(Routes.LOBBY) { LobbyScreen(navController) }
+
+        composable(Routes.PRE_GAME) {  }
+        composable(Routes.GAME) { }
+        composable(Routes.POST_GAME) {  }
     }
 }
