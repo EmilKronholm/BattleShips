@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class PlayerViewModel : ViewModel() {
-    private var players = MutableStateFlow<Map<String, Player>>(emptyMap())
+    var players = MutableStateFlow<Map<String, Player>>(emptyMap())
     val localUserID = "?"
     val playerEngine = PlayerEngine()
 
