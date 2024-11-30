@@ -16,11 +16,6 @@ import androidx.compose.runtime.currentRecomposeScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 
-object Routes {
-    const val HOME = "home"
-    const val ENTER_NAME = "enter_name"
-}
-
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +28,15 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+}
+
+object Routes {
+    const val HOME = "home"
+    const val ENTER_NAME = "enter_name"
+    const val LOBBY = "lobby"
+    const val PRE_GAME = "pregame/{gameID}"
+    const val GAME = "game/{gameID}"
+    const val POST_GAME = "game/{gameID}"
 }
 
 @Composable
