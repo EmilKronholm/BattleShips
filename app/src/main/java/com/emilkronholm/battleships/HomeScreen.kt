@@ -49,7 +49,13 @@ fun HomeScreenBackground() {
 }
 
 @Composable
-fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
+fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, modifier: Modifier = Modifier) {
+    val sharedPreferences = LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
+
+    LaunchedEffect(Unit) {
+        playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -76,17 +82,20 @@ fun HomeScreen(navController: NavController, modifier: Modifier = Modifier) {
 
         Button(
             modifier = Modifier.width(300.dp),
-            onClick = {}
+            onClick = {
+                navController.navigate(Routes.LOBBY)
+            }
         ) {
-            Text("Continue as *playername*", fontSize = 20.sp, fontFamily = PixelFont)
+            Text("Continue as ${playerViewModel.getName()}", fontSize = 20.sp, fontFamily = PixelFont)
         }
     }
 }
 
 
 @Composable
-fun EnterNameScreen(navController: NavController, modifier: Modifier = Modifier) {
+fun EnterNameScreen(navController: NavController, playerViewModel: PlayerViewModel, modifier: Modifier = Modifier) {
     var inputName by remember { mutableStateOf("") }
+    val sharedPreferences = LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
 
     Button(
         onClick = {
@@ -131,10 +140,26 @@ fun EnterNameScreen(navController: NavController, modifier: Modifier = Modifier)
             singleLine = true,
             modifier = Modifier.padding(20.dp)
         )
-
+        val context = LocalContext.current
         Button(
             modifier = Modifier.width(300.dp),
-            onClick = {}
+            onClick = {
+                playerViewModel.addPlayer(
+                    inputName,
+                    onSuccess = { id ->
+                        playerViewModel.localUserID = id
+                        sharedPreferences.edit().putString("playerId", id).apply()
+                        navController.navigate(Routes.LOBBY)
+                    },
+                    onFailure = {
+                        Toast.makeText(
+                            context,
+                            "Something went wrong.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                )
+            }
         ) {
             Text("Join", fontSize = 30.sp, fontFamily = PixelFont)
         }
