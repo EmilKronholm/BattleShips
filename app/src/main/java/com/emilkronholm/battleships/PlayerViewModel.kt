@@ -1,12 +1,14 @@
 package com.emilkronholm.battleships
 
+import android.util.Log
+import androidx.compose.runtime.Composable
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class PlayerViewModel : ViewModel() {
     var players = MutableStateFlow<Map<String, Player>>(emptyMap())
-    val localUserID = "?"
-    val playerEngine = PlayerEngine()
+    var localUserID = "?"
+    private val playerEngine = PlayerEngine()
 
     fun addPlayer(name: String,
                   onSuccess : (String) -> Unit = {},
@@ -34,6 +36,10 @@ class PlayerViewModel : ViewModel() {
                 println(error)
             }
         )
+    }
+
+    fun stopScanningForPlayer() {
+        playerEngine.startScanningForPlayers()
     }
 
     override fun onCleared() {
