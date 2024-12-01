@@ -42,9 +42,9 @@ object Routes {
 @Composable
 fun BattleShipsApp() {
     val navController = rememberNavController()
+    val playerViewModel = PlayerViewModel()
 
     HomeScreenBackground()
-
     NavHost(
         navController = navController,
         startDestination = Routes.HOME,
@@ -53,9 +53,9 @@ fun BattleShipsApp() {
         popEnterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
         popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
     ) {
-        composable(Routes.HOME) { HomeScreen(navController) }
-        composable(Routes.ENTER_NAME) { EnterNameScreen(navController) }
-        composable(Routes.LOBBY) { LobbyScreen(navController) }
+        composable(Routes.HOME) { HomeScreen(navController, playerViewModel) }
+        composable(Routes.ENTER_NAME) { EnterNameScreen(navController, playerViewModel) }
+        composable(Routes.LOBBY) { LobbyScreen(navController, playerViewModel) }
 
         composable(Routes.PRE_GAME) {  }
         composable(Routes.GAME) { }
