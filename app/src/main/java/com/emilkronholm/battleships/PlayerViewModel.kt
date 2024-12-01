@@ -8,9 +8,21 @@ class PlayerViewModel : ViewModel() {
     val localUserID = "?"
     val playerEngine = PlayerEngine()
 
-    fun addPlayer(name: String) {
+    fun addPlayer(name: String,
+                  onSuccess : (String) -> Unit = {},
+                  onFailure : (String) -> Unit = {}) {
         val player = Player (name = name)
-        playerEngine.addPlayer(player)
+        playerEngine.addPlayer(player, onSuccess = { id ->
+            println("New player added with id: $id")
+            onSuccess(id)
+        }, onFailure = { exception ->
+            onFailure("")
+            Log.e("PlayerViewModel", exception)
+        })
+    }
+
+    fun getName() : String? {
+        return players.value[localUserID]?.name
     }
 
     fun scanForPlayers() {
