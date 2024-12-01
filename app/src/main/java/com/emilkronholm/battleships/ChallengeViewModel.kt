@@ -12,6 +12,7 @@ class ChallengeViewModel : ViewModel() {
         challengeEngine.startScanningForChallenge(
             playerId,
             onSuccess = { map ->
+                println("Viewmodel found a new challenge")
                 challenges.value = map
             },
             onFailure = { error ->
