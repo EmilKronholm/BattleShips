@@ -12,6 +12,7 @@ import com.emilkronholm.battleships.ui.theme.BattleShipsTheme
 
 import androidx.navigation.compose.composable
 import androidx.compose.animation.*
+import androidx.compose.material3.Text
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -57,8 +58,12 @@ fun BattleShipsApp() {
         composable(Routes.ENTER_NAME) { EnterNameScreen(navController, playerViewModel) }
         composable(Routes.LOBBY) { LobbyScreen(navController, playerViewModel) }
 
-        composable(Routes.PRE_GAME) {  }
-        composable(Routes.GAME) { }
+        composable(Routes.PRE_GAME+"/{gameID}") {
+            PreGameScreen(navController, playerViewModel)
+        }
+        composable(Routes.GAME+"/{gameID}") {
+
+        }
         composable(Routes.POST_GAME) {  }
     }
 }
