@@ -1,10 +1,8 @@
-package com.example.shipgrid
+package com.emilkronholm.battleships
 
-import androidx.compose.runtime.mutableStateOf
 import kotlin.random.Random
 
 data class Coordinate(val x: Int, val y: Int)
-enum class BoardSquareState { EMPTY, WHOLE, HIT }
 
 //Board represents the state of the game
 //Contains ships
@@ -116,7 +114,7 @@ class Ship(position: Coordinate, var isVertical: Boolean, val length: Int) {
     fun getState(coordinate: Coordinate) : BoardSquareState? =
         parts.firstOrNull { it.coordinate == coordinate }?.let {
             part -> if (part.isHit) BoardSquareState.HIT
-                    else BoardSquareState.WHOLE
+                    else BoardSquareState.HIDDEN
         }
 
     fun getListOfSurroundingCoordinates() : List<Coordinate> {
