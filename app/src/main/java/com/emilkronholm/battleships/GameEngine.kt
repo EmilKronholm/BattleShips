@@ -23,13 +23,13 @@ enum class BoardSquareState {
 }
 
 data class Game (
-    val player1ID: String,
-    val player2ID: String,
-    val player1Ready: Boolean,
-    val player2Ready: Boolean,
-    val board1 : List<List<BoardSquareState>>,
-    val board2 : List<List<BoardSquareState>>,
-    val gameState : GameState
+    val player1ID: String = "",
+    val player2ID: String = "",
+    val player1Ready: Boolean = false,
+    val player2Ready: Boolean= false,
+    val board1 : List<BoardSquareState> = List(100) { BoardSquareState.EMPTY },
+    val board2 : List<BoardSquareState> = List(100) { BoardSquareState.EMPTY },
+    val gameState : GameState = GameState.PRE_GAME
 )
 
 data class Move (
@@ -130,12 +130,12 @@ class GameEngine {
         if (move.isPlayer1) {
             boardFieldName = "board1"
             val updatedBoard = game.board1.toMutableList()
-            updatedBoard[move.x].toMutableList()[move.y] = move.result
+            updatedBoard[move.x+move.y*10] = move.result
             updatedGame = game.copy(board1 = updatedBoard)
         } else {
             boardFieldName = "board2"
             val updatedBoard = game.board2.toMutableList()
-            updatedBoard[move.x].toMutableList()[move.y] = move.result
+            updatedBoard[move.x+move.y*10] = move.result
             updatedGame = game.copy(board2 = updatedBoard)
         }
 

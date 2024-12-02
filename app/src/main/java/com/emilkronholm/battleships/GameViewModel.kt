@@ -15,7 +15,7 @@ class GameViewModel : ViewModel() {
 
     // Create a new game and set initial state
     fun createGame(player1ID: String, player2ID: String) {
-        val initialBoard = List(10) { List(10) { BoardSquareState.EMPTY } }
+        val initialBoard = List(100) { BoardSquareState.EMPTY }
 
         val newGame = Game(
             player1ID = player1ID,
