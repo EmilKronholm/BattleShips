@@ -55,9 +55,13 @@ fun HomeScreenBackground() {
 @Composable
 fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, modifier: Modifier = Modifier) {
     val sharedPreferences = LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
+    var username by remember { mutableStateOf("...") }
 
     LaunchedEffect(Unit) {
         playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
+        playerViewModel.getName() { name ->
+            username = name
+        }
     }
 
     Column(
@@ -90,7 +94,8 @@ fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, m
                 navController.navigate(Routes.LOBBY)
             }
         ) {
-            Text("Continue as ${playerViewModel.getName()}", fontSize = 20.sp, fontFamily = PixelFont)
+
+            Text("Continue as ${username}", fontSize = 20.sp, fontFamily = PixelFont)
         }
     }
 }
