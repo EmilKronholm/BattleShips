@@ -60,7 +60,7 @@ fun LobbyScreen(navController: NavController, playerViewModel: PlayerViewModel, 
     for (game in games) {
         println("GAME JUST STARTED!!!")
         //we have found a game oh yeah
-        navController.navigate(Routes.GAME+"/"+game.key)
+        navController.navigate(Routes.PRE_GAME+"/"+game.key)
     }
 
     Column(
