@@ -23,8 +23,18 @@ class PlayerViewModel : ViewModel() {
         })
     }
 
-    fun getName() : String? {
-        return players.value[localUserID]?.name
+    fun getName(onResult: (String) -> Unit) {
+        var name = "..."
+        if (players.value[localUserID]?.name == null) {
+            playerEngine.getPlayerName(localUserID, onSuccess = { n ->
+                onResult(n)
+                return@getPlayerName
+            })
+
+        }
+        else {
+            onResult(players.value[localUserID]?.name!!)
+        }
     }
 
     fun scanForPlayers() {
