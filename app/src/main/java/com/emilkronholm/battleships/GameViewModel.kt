@@ -4,11 +4,12 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class GameViewModel : ViewModel() {
     private val gameEngine = GameEngine()
 
-    val gamesMap = MutableStateFlow<Map<String, Game>>(emptyMap())
+    var gamesMap = MutableStateFlow<Map<String, Game>>(emptyMap())
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
@@ -63,10 +64,12 @@ class GameViewModel : ViewModel() {
 
     fun startScanForGames(playerID: String) {
         gameEngine.scanForGamesForPlayer(playerID = playerID, onSuccess = { (gameID, game) ->
-            gamesMap.value = gamesMap.value.toMutableMap().apply {
-                put(gameID, game)
-            }
+            println("Callback for game in viewmodel")
+            gamesMap.value = mapOf("123" to Game())
+            gamesMap.value = mapOf(gameID to game)
+
         })
+
     }
 
     override fun onCleared() {
