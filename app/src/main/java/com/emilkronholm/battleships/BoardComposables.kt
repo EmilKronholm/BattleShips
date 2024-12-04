@@ -1,5 +1,6 @@
 package com.emilkronholm.battleships
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -16,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -24,6 +26,7 @@ fun Grid()
     var board by remember {mutableStateOf(Board())}
     var selectedBoat : Ship? by remember { mutableStateOf(null) }
     var offset by remember { mutableIntStateOf(0) }
+    val context = LocalContext.current
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(10),
@@ -54,6 +57,11 @@ fun Grid()
                     if (!board.isShipValid(selectedBoat!!))
                     {
                         println("Ooops, pos is not valid...")
+                        Toast.makeText(
+                            context,
+                            "Cannot move boat, illegal position.",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         selectedBoat?.moveShipTo(pos)
                         board.ships.add(selectedBoat!!)
 
