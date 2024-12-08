@@ -1,24 +1,24 @@
-package com.emilkronholm.battleships
+    package com.emilkronholm.battleships
 
-import android.widget.Toast
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
+    import android.widget.Toast
+    import androidx.compose.foundation.background
+    import androidx.compose.foundation.clickable
+    import androidx.compose.foundation.layout.Box
+    import androidx.compose.foundation.layout.aspectRatio
+    import androidx.compose.foundation.layout.fillMaxWidth
+    import androidx.compose.foundation.layout.padding
+    import androidx.compose.foundation.lazy.grid.GridCells
+    import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+    import androidx.compose.runtime.Composable
+    import androidx.compose.runtime.getValue
+    import androidx.compose.runtime.mutableIntStateOf
+    import androidx.compose.runtime.mutableStateOf
+    import androidx.compose.runtime.remember
+    import androidx.compose.runtime.setValue
+    import androidx.compose.ui.Modifier
+    import androidx.compose.ui.graphics.Color
+    import androidx.compose.ui.platform.LocalContext
+    import androidx.compose.ui.unit.dp
 
 @Composable
 fun Grid()
@@ -88,25 +88,25 @@ fun Grid()
     }
 }
 
-@Composable
-fun GridItem(index: Int, state : BoardSquareState, modifier: Modifier = Modifier, onClick: () -> Unit) {
-    var status by remember { mutableStateOf(false) }
-    var color by remember { mutableStateOf(Color.Red) }
+    @Composable
+    fun GridItem(index: Int, state : BoardSquareState, modifier: Modifier = Modifier, onClick: () -> Unit) {
+        var status by remember { mutableStateOf(false) }
+        var color by remember { mutableStateOf(Color.Red) }
 
-    if (state == BoardSquareState.HIDDEN) {
-        color = Color(173, 173, 227, 255)
-    } else {
-        color = Color(99, 21, 206, 255)
+        if (state == BoardSquareState.HIDDEN) {
+            color = Color(173, 173, 227, 255)
+        } else {
+            color = Color(99, 21, 206, 255)
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.05f)
+                .aspectRatio(1f)
+                .padding(2.dp)
+                .background(color)
+                .clickable {
+                    onClick()
+                }
+        )
     }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(0.05f)
-            .aspectRatio(1f)
-            .padding(2.dp)
-            .background(color)
-            .clickable {
-                onClick()
-            }
-    )
-}
