@@ -13,7 +13,7 @@ class Board() {
     val size = Coordinate(10, 10)
 
     init {
-        for (x in 1..4) {
+        for (x in arrayOf(1, 1, 2, 2, 3, 4)) {
             while (true) {
                 val pos = Coordinate(Random.nextInt(0, 10), Random.nextInt(0, 10))
                 val newShip = Ship(pos, Random.nextInt(0, 2) % 2 == 0, x)
@@ -98,7 +98,7 @@ class Ship(position: Coordinate, var isVertical: Boolean, val length: Int) {
     fun updatePosition(position : Coordinate, isVertical : Boolean, length : Int)
     {
         parts.clear()
-        for (a in 0..length) {
+        for (a in 0..length-1) {
             val newPosition = if (isVertical) Coordinate(position.x, position.y+a)
             else Coordinate(position.x+a, position.y)
             parts.add(ShipPart(newPosition))
