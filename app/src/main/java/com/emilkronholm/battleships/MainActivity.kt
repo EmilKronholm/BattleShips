@@ -35,9 +35,9 @@ object Routes {
     const val HOME = "home"
     const val ENTER_NAME = "enter_name"
     const val LOBBY = "lobby"
-    const val PRE_GAME = "pregame/{gameID}"
-    const val GAME = "game/{gameID}"
-    const val POST_GAME = "game/{gameID}"
+    const val PRE_GAME = "pregame"
+    const val GAME = "game"
+    const val POST_GAME = "game"
 }
 
 @Composable
