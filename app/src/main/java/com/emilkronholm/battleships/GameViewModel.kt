@@ -32,10 +32,11 @@ class GameViewModel : ViewModel() {
     }
 
     // Set a player ready
-    fun setPlayerReady(gameID: String, isPlayer1: Boolean) {
+    fun setPlayerReady(gameID: String, isPlayer1: Boolean, isReady:Boolean) {
         gameEngine.setReady(
             gameID = gameID,
-            isPlayer1 = isPlayer1
+            isPlayer1 = isPlayer1,
+            isReady = isReady
         )
     }
 
