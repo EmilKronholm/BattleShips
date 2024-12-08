@@ -1,5 +1,6 @@
 package com.emilkronholm.battleships
 
+import androidx.compose.runtime.mutableStateListOf
 import kotlin.random.Random
 
 data class Coordinate(val x: Int, val y: Int)
@@ -9,7 +10,7 @@ data class Coordinate(val x: Int, val y: Int)
 //Responsible for calculating hit/miss
 //Litterly the brain of the game oh yeah
 class Board() {
-    var ships = mutableListOf<Ship>()
+    var ships = mutableStateListOf<Ship>()
     val size = Coordinate(10, 10)
 
     init {
