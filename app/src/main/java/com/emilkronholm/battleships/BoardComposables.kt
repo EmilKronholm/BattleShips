@@ -20,73 +20,66 @@
     import androidx.compose.ui.platform.LocalContext
     import androidx.compose.ui.unit.dp
 
-@Composable
-fun Grid()
-{
-    var board by remember {mutableStateOf(Board())}
-    var selectedBoat : Ship? by remember { mutableStateOf(null) }
-    var offset by remember { mutableIntStateOf(0) }
-    val context = LocalContext.current
+    @Composable
+    fun Grid(board: Board, updateBoard: () -> Unit) {
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(10),
-        modifier = Modifier.padding(8.dp).background(Color(70, 21, 100, 200))
-    ) {
-        items(100) { index ->
-            val coordinate = Coordinate(index/10, index%10)
-            GridItem(index, board.getState(coordinate)) {
-                //If null, try to select a new boat
-                if (selectedBoat == null)
-                {
-                    selectedBoat = board.getShipAt(coordinate)
+        var selectedBoat : Ship? by remember { mutableStateOf(null) }
+        var offset by remember { mutableIntStateOf(0) }
+        val context = LocalContext.current
 
-
-
-                    println("Tried to get boat at $coordinate")
-                    println(" is null? ")
-                    println(selectedBoat == null)
-                }
-                //If not null, try to move selected boat
-                else
-                {
-                    val pos = selectedBoat!!.parts[0].coordinate
-
-                    selectedBoat?.moveShipTo(coordinate)
-                    board.ships.remove(selectedBoat!!)
-
-                    if (!board.isShipValid(selectedBoat!!))
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(10),
+            modifier = Modifier.padding(8.dp).background(Color(70, 21, 100, 200))
+        ) {
+            items(100) { index ->
+                val coordinate = Coordinate(index/10, index%10)
+                GridItem(index, board.getState(coordinate)) {
+                    //If null, try to select a new boat
+                    if (selectedBoat == null)
                     {
-                        println("Ooops, pos is not valid...")
-                        Toast.makeText(
-                            context,
-                            "Cannot move boat, illegal position.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        selectedBoat?.moveShipTo(pos)
-                        board.ships.add(selectedBoat!!)
-
-
-                        var temp = board
-                        board = Board()
-                        board = temp
+                        selectedBoat = board.getShipAt(coordinate)
+                        println("Tried to get boat at $coordinate")
                     }
+                    //If not null, try to move selected boat
                     else
                     {
-                        board.ships.add(selectedBoat!!)
-                        var temp = board
-                        board = Board()
-                        board = temp
+                        val pos = selectedBoat!!.parts[0].coordinate
 
-                        println("Tried to move boat to $coordinate")
+                        if (pos == coordinate)
+                        {
+                            selectedBoat!!.isVertical = !selectedBoat!!.isVertical
+                        }
+
+                        selectedBoat?.moveShipTo(coordinate)
+                        board.ships.remove(selectedBoat!!)
+
+                        if (!board.isShipValid(selectedBoat!!))
+                        {
+                            println("Ooops, pos is not valid...")
+                            Toast.makeText(
+                                context,
+                                "Cannot move boat, illegal position.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            if (pos == coordinate)
+                            {
+                                selectedBoat!!.isVertical = !selectedBoat!!.isVertical
+                            }
+                            selectedBoat?.moveShipTo(pos)
+                            board.ships.add(selectedBoat!!)
+                        }
+                        else
+                        {
+                            board.ships.add(selectedBoat!!)
+                        }
+
+                        updateBoard()
                         selectedBoat = null
                     }
-
-                    selectedBoat = null
                 }
             }
         }
     }
-}
 
     @Composable
     fun GridItem(index: Int, state : BoardSquareState, modifier: Modifier = Modifier, onClick: () -> Unit) {
