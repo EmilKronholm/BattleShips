@@ -84,4 +84,14 @@ class GameViewModel : ViewModel() {
         gameEngine.uploadBoard(gameID, isPlayer1, list)
     }
 
+    private fun boardToList(board: Board) : List<BoardSquareState> {
+        val list = List<BoardSquareState>(100) {BoardSquareState.EMPTY}.toMutableList()
+
+        for (x in 0..9) {
+            for (y in 0..9) {
+                list[10*x+y] = board.getState(Coordinate(x, y))
+            }
+        }
+        return list
+    }
 }
