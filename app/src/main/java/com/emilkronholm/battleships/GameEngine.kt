@@ -106,12 +106,12 @@ class GameEngine {
             }
     }
 
-    fun setReady(gameID: String, isPlayer1: Boolean)
+    fun setReady(gameID: String, isPlayer1: Boolean, isReady: Boolean)
     {
         val field = if (isPlayer1) "player1Ready" else "player2Ready"
         database.collection("games")
             .document(gameID)
-            .update(field, true)
+            .update(field, isReady)
     }
 
     //Game
