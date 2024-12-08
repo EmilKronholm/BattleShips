@@ -77,4 +77,11 @@ class GameViewModel : ViewModel() {
         super.onCleared()
 
     }
+
+    fun uploadBoard(gameID: String, isPlayer1: Boolean, board: Board) {
+        val list = boardToList(board)
+        assert(list.size == 100)
+        gameEngine.uploadBoard(gameID, isPlayer1, list)
+    }
+
 }
