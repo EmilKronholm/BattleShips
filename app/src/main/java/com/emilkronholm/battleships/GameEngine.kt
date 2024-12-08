@@ -152,4 +152,14 @@ class GameEngine {
 
 
     }
+
+    fun uploadBoard(gameID:String, isPlayer1: Boolean, list: List<BoardSquareState>) {
+        val field = if (isPlayer1) "board1" else "board2"
+        database.collection("games").document(gameID)
+            .update(field, list).addOnSuccessListener {
+                println("Updated ${field}")
+            }.addOnFailureListener { exception ->
+                println("error wehn updating ${field}  ${exception}")
+            }
+    }
 }
