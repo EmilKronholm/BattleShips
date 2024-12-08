@@ -20,7 +20,7 @@ class Board() {
 
                 if (isShipValid(newShip)) {
                     ships.add(newShip)
-                    break;
+                    break
                 }
             }
         }
@@ -34,7 +34,7 @@ class Board() {
                 return ship;
             }
         }
-        return null;
+        return null
     }
 
     fun isShipValid(ship : Ship) : Boolean {
@@ -80,6 +80,7 @@ class Board() {
     fun shoot(coordinate: Coordinate): Boolean {
         for (ship in ships) {
             if (ship.contains(coordinate)) {
+
                 return true
             }
         }
