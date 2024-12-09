@@ -14,6 +14,8 @@ import androidx.navigation.compose.composable
 import androidx.compose.animation.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 
@@ -48,7 +50,8 @@ fun BattleShipsApp() {
     HomeScreenBackground()
     NavHost(
         navController = navController,
-        startDestination = Routes.HOME,
+        startDestination = "game/PhGeApOIZXa43K1fJpSl",
+        //startDestination = Routes.HOME,
         enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
         exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) },
         popEnterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
@@ -58,11 +61,13 @@ fun BattleShipsApp() {
         composable(Routes.ENTER_NAME) { EnterNameScreen(navController, playerViewModel) }
         composable(Routes.LOBBY) { LobbyScreen(navController, playerViewModel) }
 
-        composable(Routes.PRE_GAME+"/{gameID}") {
-            PreGameScreen(navController, playerViewModel)
+        composable(Routes.PRE_GAME+"/{gameID}") { backStackEntry ->
+            val gameID = backStackEntry.arguments?.getString("gameID") ?: ""
+            PreGameScreen(navController, playerViewModel, gameID)
         }
-        composable(Routes.GAME+"/{gameID}") {
-
+        composable(Routes.GAME+"/{gameID}") { backStackEntry ->
+            val gameID = backStackEntry.arguments?.getString("gameID") ?: ""
+            GameScreen(navController, playerViewModel, gameID)
         }
         composable(Routes.POST_GAME) {  }
     }
