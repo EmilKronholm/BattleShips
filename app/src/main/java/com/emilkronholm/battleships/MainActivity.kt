@@ -1,5 +1,6 @@
 package com.emilkronholm.battleships
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -13,8 +14,14 @@ import com.emilkronholm.battleships.ui.theme.BattleShipsTheme
 import androidx.navigation.compose.composable
 import androidx.compose.animation.*
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -47,10 +54,20 @@ fun BattleShipsApp() {
     val navController = rememberNavController()
     val playerViewModel = PlayerViewModel()
 
+    val sharedPreferences = LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
+    var username by remember { mutableStateOf("...") }
+
+    LaunchedEffect(Unit) {
+        playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
+        playerViewModel.getName() { name ->
+            username = name
+        }
+    }
+
     HomeScreenBackground()
     NavHost(
         navController = navController,
-        startDestination = "game/PhGeApOIZXa43K1fJpSl",
+        startDestination = "game/96Rgrm2x9U0fCaTByQTF",
         //startDestination = Routes.HOME,
         enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
         exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) },

@@ -128,20 +128,20 @@ class GameEngine {
         var boardFieldName : String
 
         if (move.isPlayer1) {
-            boardFieldName = "board1"
-            val updatedBoard = game.board1.toMutableList()
-            updatedBoard[move.x+move.y*10] = move.result
-            updatedGame = game.copy(board1 = updatedBoard)
-        } else {
             boardFieldName = "board2"
             val updatedBoard = game.board2.toMutableList()
             updatedBoard[move.x+move.y*10] = move.result
             updatedGame = game.copy(board2 = updatedBoard)
+        } else {
+            boardFieldName = "board1"
+            val updatedBoard = game.board1.toMutableList()
+            updatedBoard[move.x+move.y*10] = move.result
+            updatedGame = game.copy(board1 = updatedBoard)
         }
 
 
-        val board = if (move.isPlayer1) updatedGame.board1 else updatedGame.board2
-        val gameState = if (move.isPlayer1) GameState.PLAYER1_TURN else GameState.PLAYER2_TURN
+        val board = if (move.isPlayer1) updatedGame.board2 else updatedGame.board1
+        val gameState = if (move.isPlayer1) GameState.PLAYER2_TURN else GameState.PLAYER1_TURN
         //No validation is made here
         database.collection("games")
             .document(gameID)

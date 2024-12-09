@@ -25,6 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,10 +34,27 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.asStateFlow
 
+object VerboseColors {
+    val empty =  Color(99, 21, 206, 255)
+    val hidden = Color(173, 173, 227, 255)
+    val hit = Color(236, 0, 111, 255)
+    val missed = Color(18, 18, 23, 255)
+    val sunk = Color(93, 0, 0, 255)
+}
+
+object Colors {
+    val empty =  Color(99, 21, 206, 255)
+    val hidden = Color(99, 21, 206, 255)
+    val hit = Color(236, 0, 111, 255)
+    val missed = Color(18, 18, 23, 255)
+    val sunk = Color(93, 0, 0, 255)
+}
+
 @Composable
 fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, gameID: String) {
     val gameViewModel: GameViewModel = viewModel()
     val games by gameViewModel.gamesMap.asStateFlow().collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         gameViewModel.observeGame(gameID)
@@ -63,7 +81,8 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
 
     var board by remember { mutableStateOf(Board()) }
     val isPlayer1 = playerViewModel.localUserID == game.player1ID
-
+    println("LocaluserID: ${playerViewModel.localUserID}")
+    println("player1ID: ${game.player1ID}")
 
     Column (
         modifier = Modifier.fillMaxSize(),
@@ -71,10 +90,17 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
         verticalArrangement = Arrangement.Center
     ){
         OpponentGrid(gameViewModel, if (isPlayer1) game.board2 else game.board1, onClick = { coordinate ->
-            //Player makes a good old move
+            //Player makes a move
+            //Is it players turn?
             if ((isPlayer1 && game.gameState == GameState.PLAYER1_TURN) ||
                 (!isPlayer1 && game.gameState == GameState.PLAYER2_TURN)) {
-
+                gameViewModel.makeMove(gameID, coordinate, isPlayer1)
+            } else {
+                Toast.makeText(
+                    context,
+                    "Not your turn!",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         })
 
@@ -83,16 +109,19 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
         })
 
 
+        //Resign button
         Button(
             modifier = Modifier.width(200.dp),
             onClick = {
-
+                gameViewModel.resignGame(gameID, isPlayer1)
             }
         ) {
             Text("Resign", fontSize = 20.sp, fontFamily = PixelFont)
         }
 
         var msg = ""
+        print("isplayer1: ")
+        println(isPlayer1)
         if (isPlayer1) msg = if (game.gameState == GameState.PLAYER1_TURN) "Your turn" else "Waiting for opponent..."
         if (!isPlayer1) msg = if (game.gameState == GameState.PLAYER2_TURN) "Your turn" else "Waiting for opponent..."
         Text(msg, fontSize = 20.sp, fontFamily = PixelFont, color = Color.White)
@@ -129,7 +158,7 @@ fun OpponentGrid(gameViewModel: GameViewModel, list: List<BoardSquareState>, onC
     ) {
         items(100) { index ->
             GridItemPlaying(index, list[index], false) {
-                onClick(Coordinate(index/10, index%10))
+                onClick(Coordinate(index%10, index/10))
             }
         }
     }
@@ -140,10 +169,30 @@ fun GridItemPlaying(index: Int, state : BoardSquareState, isVerbose: Boolean = t
     var status by remember { mutableStateOf(false) }
     var color by remember { mutableStateOf(Color.Red) }
 
-    if (state == BoardSquareState.HIDDEN && isVerbose) {
-        color = Color(173, 173, 227, 255)
+    if (isVerbose) {
+        if (state == BoardSquareState.HIT) {
+            color = VerboseColors.hit
+        } else if (state == BoardSquareState.EMPTY) {
+            color = VerboseColors.empty
+        } else if (state == BoardSquareState.HIDDEN) {
+            color = VerboseColors.hidden
+        } else if (state == BoardSquareState.SUNK) {
+            color = VerboseColors.sunk
+        } else if (state == BoardSquareState.MISSED) {
+            color = VerboseColors.missed
+        }
     } else {
-        color = Color(99, 21, 206, 255)
+        if (state == BoardSquareState.HIT) {
+            color = Colors.hit
+        } else if (state == BoardSquareState.EMPTY) {
+            color = Colors.empty
+        } else if (state == BoardSquareState.HIDDEN) {
+            color = Colors.hidden
+        } else if (state == BoardSquareState.SUNK) {
+            color = Colors.sunk
+        } else if (state == BoardSquareState.MISSED) {
+            color = Colors.missed
+        }
     }
 
     Box(

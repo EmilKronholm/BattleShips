@@ -1,6 +1,7 @@
 package com.emilkronholm.battleships
 
 import android.util.Log
+import androidx.compose.runtime.currentRecomposeScope
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,12 +47,42 @@ class GameViewModel : ViewModel() {
     }
 
     // Handle player moves
-    fun makeMove(gameID: String, move: Move) {
+    fun makeMove(gameID: String, square: Coordinate, isPlayer1: Boolean) {
         gamesMap.value[gameID]?.let { currentGame ->
+
+            //Is the move a valid move?
+            val board = if (isPlayer1) currentGame.board2 else currentGame.board1
+            val index = square.y * 10 + square.x
+
+            //Invalid move (already shot)
+            if (board[index] == BoardSquareState.HIT ||
+                board[index] == BoardSquareState.MISSED ||
+                board[index] == BoardSquareState.SUNK) {
+
+                println("Invalid move! :)")
+                return
+            }
+
+            val result = if (board[index] == BoardSquareState.HIDDEN) BoardSquareState.HIT
+                         else BoardSquareState.MISSED
+
+            println("RESULT IS: ${result}")
+
+            val move = Move(
+                square.x,
+                square.y,
+                isPlayer1,
+                result
+            )
+
             gameEngine.makeMove(move, currentGame, gameID)
         } ?: run {
             Log.e("GameViewModel", "Game for gameID was null")
         }
+    }
+
+    fun resignGame(gameID: String, isPlayer1: Boolean) {
+        gameEngine.resignGame(gameID, isPlayer1)
     }
 
     // Fetch and observe game state
