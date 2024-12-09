@@ -153,6 +153,14 @@ class GameEngine {
 
     }
 
+    fun resignGame(gameID: String, isPlayer1: Boolean) {
+        val newGameState = if (isPlayer1) GameState.PLAYER2_WIN else GameState.PLAYER1_WIN
+
+        database.collection("games")
+            .document(gameID)
+            .update("gameState", newGameState)
+    }
+
     fun uploadBoard(gameID:String, isPlayer1: Boolean, list: List<BoardSquareState>) {
         val field = if (isPlayer1) "board1" else "board2"
         database.collection("games").document(gameID)
