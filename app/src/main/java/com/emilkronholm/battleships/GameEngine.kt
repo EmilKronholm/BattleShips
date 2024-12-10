@@ -115,11 +115,11 @@ class GameEngine {
     }
 
     //Game
-    fun startGame(gameID : String)
+    fun setGameState(gameID: String, newState : GameState)
     {
         database.collection("games")
             .document(gameID)
-            .update("gameState", GameState.PLAYER1_TURN)
+            .update("gameState", newState)
     }
 
     fun makeMove(move: Move, game: Game, gameID: String)
@@ -151,14 +151,6 @@ class GameEngine {
             ))
 
 
-    }
-
-    fun resignGame(gameID: String, isPlayer1: Boolean) {
-        val newGameState = if (isPlayer1) GameState.PLAYER2_WIN else GameState.PLAYER1_WIN
-
-        database.collection("games")
-            .document(gameID)
-            .update("gameState", newGameState)
     }
 
     fun uploadBoard(gameID:String, isPlayer1: Boolean, list: List<BoardSquareState>) {
