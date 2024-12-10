@@ -125,4 +125,44 @@ class GameViewModel : ViewModel() {
         }
         return list
     }
+
+    //Takes a board (as list) and returns a copy where HIT's been updated to SUNK if all
+    //connected parts are HIT
+    private fun updateForSunk(list: List<BoardSquareState>): List<BoardSquareState> {
+        val updatedList = list.toMutableList()
+        val visited = mutableSetOf<Int>() // Tracks indices we've already processed
+
+        fun dfs(index: Int, currentShip: MutableList<Int>) {
+            if (index in visited || list[index] != BoardSquareState.HIT && list[index] != BoardSquareState.HIDDEN) return
+            visited.add(index)
+            currentShip.add(index)
+
+            // Calculate row and column
+            val row = index / 10
+            val col = index % 10
+
+            // Explore neighbors (up, down, left, right)
+            if (row > 0) dfs(index - 10, currentShip) // Up
+            if (row < 9) dfs(index + 10, currentShip) // Down
+            if (col > 0) dfs(index - 1, currentShip) // Left
+            if (col < 9) dfs(index + 1, currentShip) // Right
+        }
+
+        for (i in list.indices) {
+            if (i in visited || list[i] != BoardSquareState.HIT && list[i] != BoardSquareState.HIDDEN) continue
+
+            val currentShip = mutableListOf<Int>()
+            dfs(i, currentShip)
+
+            // If all parts of the ship are HIT, mark them as SUNK
+            if (currentShip.all { list[it] == BoardSquareState.HIT }) {
+                for (index in currentShip) {
+                    updatedList[index] = BoardSquareState.SUNK
+                }
+            }
+        }
+
+        return updatedList
+    }
+
 }
