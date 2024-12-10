@@ -32,7 +32,7 @@ fun PreGameScreen(navController: NavController, playerViewModel: PlayerViewModel
     val games by gameViewModel.gamesMap.asStateFlow().collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        gameViewModel.observeGame(gameID)
+        gameViewModel.observeGame(gameID, playerViewModel.localUserID)
     }
 
     if (games[gameID] == null) {
@@ -94,14 +94,14 @@ fun PreGameScreen(navController: NavController, playerViewModel: PlayerViewModel
                 if (isPlayer1) newValue = !game.player1Ready
                 if (!isPlayer1) newValue = !game.player2Ready
 
-                gameViewModel.setPlayerReady(gameID, isPlayer1, newValue)
+                gameViewModel.setPlayerReady(newValue)
                 gameViewModel.uploadBoard(gameID, isPlayer1, board)
 
                 if (isPlayer1 && game.player2Ready && newValue){
-                    gameViewModel.startGame(gameID)
+                    gameViewModel.startGame()
                 }
                 if (!isPlayer1 && game.player1Ready && newValue){
-                    gameViewModel.startGame(gameID)
+                    gameViewModel.startGame()
                 }
             }
         ) {
