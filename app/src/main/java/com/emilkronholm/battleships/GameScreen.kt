@@ -57,7 +57,7 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        gameViewModel.observeGame(gameID)
+        gameViewModel.observeGame(gameID, playerViewModel.localUserID)
     }
 
     if (games[gameID] == null) {
@@ -94,7 +94,9 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
             //Is it players turn?
             if ((isPlayer1 && game.gameState == GameState.PLAYER1_TURN) ||
                 (!isPlayer1 && game.gameState == GameState.PLAYER2_TURN)) {
-                gameViewModel.makeMove(gameID, coordinate, isPlayer1)
+                gameViewModel.makeMove(coordinate, onError = {
+                    println("Something went wrong during move")
+                })
             } else {
                 Toast.makeText(
                     context,
@@ -113,7 +115,7 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
         Button(
             modifier = Modifier.width(200.dp),
             onClick = {
-                gameViewModel.resignGame(gameID, isPlayer1)
+                gameViewModel.resignGame()
             }
         ) {
             Text("Resign", fontSize = 20.sp, fontFamily = PixelFont)
