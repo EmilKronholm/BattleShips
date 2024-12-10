@@ -7,15 +7,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+data class CurrentGame(
+    val gameID: String,
+    val playerID: String,
+    val isPlayer1: Boolean
+)
+
 class GameViewModel : ViewModel() {
     private val gameEngine = GameEngine()
 
     var gamesMap = MutableStateFlow<Map<String, Game>>(emptyMap())
+    var currentGame = MutableStateFlow<CurrentGame?>(null)
 
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> get() = _errorMessage
-
-    // Create a new game and set initial state
+    // Create a new game and start pregame. State = PRE_GAME
     fun createGame(player1ID: String, player2ID: String) {
         val initialBoard = List(100) { BoardSquareState.EMPTY }
 
@@ -33,64 +37,75 @@ class GameViewModel : ViewModel() {
     }
 
     // Set a player ready
-    fun setPlayerReady(gameID: String, isPlayer1: Boolean, isReady:Boolean) {
+    fun setPlayerReady(isReady:Boolean) {
         gameEngine.setReady(
-            gameID = gameID,
-            isPlayer1 = isPlayer1,
+            gameID = currentGame.value!!.gameID,
+            isPlayer1 = currentGame.value!!.isPlayer1,
             isReady = isReady
         )
     }
 
     // Start the game
-    fun startGame(gameID: String) {
-        gameEngine.startGame(gameID)
+    fun startGame() {
+        gameEngine.setGameState(currentGame.value!!.gameID, GameState.PLAYER1_TURN)
     }
 
     // Handle player moves
-    fun makeMove(gameID: String, square: Coordinate, isPlayer1: Boolean) {
-        gamesMap.value[gameID]?.let { currentGame ->
-
+    fun makeMove(square: Coordinate, onError: (String) -> Unit) {
             //Is the move a valid move?
-            val board = if (isPlayer1) currentGame.board2 else currentGame.board1
-            val index = square.y * 10 + square.x
+        val _game = gamesMap.value[currentGame.value!!.gameID]!!
+        val board = if (currentGame.value!!.isPlayer1)
+                    _game.board2 else _game.board1
+        val index = square.y * 10 + square.x
 
-            //Invalid move (already shot)
-            if (board[index] == BoardSquareState.HIT ||
-                board[index] == BoardSquareState.MISSED ||
-                board[index] == BoardSquareState.SUNK) {
+        //Invalid move (already shot)
+        if (board[index] == BoardSquareState.HIT ||
+            board[index] == BoardSquareState.MISSED ||
+            board[index] == BoardSquareState.SUNK) {
 
-                println("Invalid move! :)")
-                return
-            }
+            println("Invalid move! :)")
+            return
+        }
 
-            val result = if (board[index] == BoardSquareState.HIDDEN) BoardSquareState.HIT
-                         else BoardSquareState.MISSED
+        //Calculate result
+        val result = if (board[index] == BoardSquareState.HIDDEN) BoardSquareState.HIT
+                     else BoardSquareState.MISSED
 
-            println("RESULT IS: ${result}")
+        //Create updated board
+        val temp = board.toMutableList()
+        temp[index] = result
+        val updatedBoard = updateForSunk(temp)
 
-            val move = Move(
-                square.x,
-                square.y,
-                isPlayer1,
-                result
-            )
+        //Upload board
+        gameEngine.uploadBoard(currentGame.value!!.gameID, !currentGame.value!!.isPlayer1, updatedBoard)
 
-            gameEngine.makeMove(move, currentGame, gameID)
-        } ?: run {
-            Log.e("GameViewModel", "Game for gameID was null")
+        //If missed, switch turns
+        if (result == BoardSquareState.MISSED) {
+            val newGameState = if (currentGame.value!!.isPlayer1)
+                GameState.PLAYER2_TURN else GameState.PLAYER1_TURN
+            gameEngine.setGameState(currentGame.value!!.gameID, newGameState)
         }
     }
 
-    fun resignGame(gameID: String, isPlayer1: Boolean) {
-        gameEngine.resignGame(gameID, isPlayer1)
+    fun resignGame() {
+        val newState = if (currentGame.value!!.isPlayer1)
+                        GameState.PLAYER2_WIN else GameState.PLAYER1_WIN
+        gameEngine.setGameState(currentGame.value!!.gameID, newState)
     }
 
     // Fetch and observe game state
-    fun observeGame(gameID: String) {
+    fun observeGame(gameID: String, playerID: String) {
         gameEngine.listenToGame(gameID = gameID, onSuccess = { game ->
             gamesMap.value = gamesMap.value.toMutableMap().apply {
                 put(gameID, game)
             }
+
+            currentGame.value = CurrentGame(
+                gameID = gameID,
+                playerID = playerID,
+                isPlayer1 = (playerID == game.player1ID)
+            )
+
         })
     }
 
@@ -111,10 +126,15 @@ class GameViewModel : ViewModel() {
 
     fun uploadBoard(gameID: String, isPlayer1: Boolean, board: Board) {
         val list = boardToList(board)
-        assert(list.size == 100)
-        gameEngine.uploadBoard(gameID, isPlayer1, list)
+        uploadBoardAsList(list)
     }
 
+    fun uploadBoardAsList(list: List<BoardSquareState> ) {
+        gameEngine.uploadBoard(currentGame.value!!.gameID, currentGame.value!!.isPlayer1, list)
+    }
+
+
+    // Utility functions
     private fun boardToList(board: Board) : List<BoardSquareState> {
         val list = List<BoardSquareState>(100) {BoardSquareState.EMPTY}.toMutableList()
 
