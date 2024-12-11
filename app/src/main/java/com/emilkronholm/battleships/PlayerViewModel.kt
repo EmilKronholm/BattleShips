@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class PlayerViewModel : ViewModel() {
     var players = MutableStateFlow<Map<String, Player>>(emptyMap())
     var localUserID = "?"
+    var localUserName : String? = null
     private val playerEngine = PlayerEngine()
 
     fun addPlayer(name: String,
@@ -23,8 +24,8 @@ class PlayerViewModel : ViewModel() {
         })
     }
 
-    fun getName(onResult: (String) -> Unit) {
-        var name = "..."
+    fun getName(onResult: (String?) -> Unit) {
+        //If player doesn't exist in local map, refer to the engine (database)
         if (players.value[localUserID]?.name == null) {
             playerEngine.getPlayerName(localUserID, onSuccess = { n ->
                 onResult(n)
