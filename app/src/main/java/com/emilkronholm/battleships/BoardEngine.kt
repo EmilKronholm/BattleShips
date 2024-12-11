@@ -103,12 +103,21 @@ class Board() {
         val invalidCoordinates = mutableSetOf<Coordinate>()
 
         for (ship in ships) {
-            if (ship.contains(coordinate)) {
+            val allCoordinates = ship.parts.map { it.coordinate }
 
-                return true
+            ship.getListOfSurroundingCoordinates().forEach { coordinate: Coordinate ->
+                if (validCoordinates.contains(coordinate)) {
+                    invalidCoordinates.add(coordinate)
+                }
+            }
+
+            allCoordinates.forEach { coordinate ->
+                if (!validCoordinates.add((coordinate))) {
+                    invalidCoordinates.add(coordinate)
+                }
             }
         }
-        return false
+        return invalidCoordinates.toList()
     }
 }
 
