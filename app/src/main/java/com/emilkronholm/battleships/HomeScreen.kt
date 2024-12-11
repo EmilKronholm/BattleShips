@@ -41,6 +41,7 @@ fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, m
     var username : String? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
+        //Load last userID and userName from sharedPreferences
         playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
         username = sharedPreferences.getString("playerName", null)
     }
@@ -69,12 +70,17 @@ fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, m
             Text("New Player", fontSize = 30.sp, fontFamily = PixelFont)
         }
 
-        Button(
-            modifier = Modifier.width(300.dp),
-            onClick = {
-                navController.navigate(Routes.LOBBY)
-            }
-        ) {
+        if (username != null) {
+            Button(
+                modifier = Modifier.width(300.dp),
+                onClick = {
+                    navController.navigate(Routes.LOBBY) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
+                }
+            ) {
 
                 Text("Continue as ${username}", fontSize = 20.sp, fontFamily = PixelFont)
             }
@@ -140,7 +146,12 @@ fun EnterNameScreen(navController: NavController, playerViewModel: PlayerViewMod
                     onSuccess = { id ->
                         playerViewModel.localUserID = id
                         sharedPreferences.edit().putString("playerId", id).apply()
-                        navController.navigate(Routes.LOBBY)
+                        sharedPreferences.edit().putString("playerName", inputName).apply()
+                        navController.navigate(Routes.LOBBY) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                inclusive = true
+                            }
+                        }
                     },
                     onFailure = {
                         Toast.makeText(
