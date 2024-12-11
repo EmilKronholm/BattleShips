@@ -38,13 +38,11 @@ val PixelFont = FontFamily(Font(R.font.pixel, FontWeight.Normal))
 @Composable
 fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, modifier: Modifier = Modifier) {
     val sharedPreferences = LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
-    var username by remember { mutableStateOf("...") }
+    var username : String? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
         playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
-        playerViewModel.getName() { name ->
-            username = name
-        }
+        username = sharedPreferences.getString("playerName", null)
     }
 
     Column(
@@ -78,7 +76,8 @@ fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, m
             }
         ) {
 
-            Text("Continue as ${username}", fontSize = 20.sp, fontFamily = PixelFont)
+                Text("Continue as ${username}", fontSize = 20.sp, fontFamily = PixelFont)
+            }
         }
     }
 }
