@@ -13,6 +13,8 @@ import com.emilkronholm.battleships.ui.theme.BattleShipsTheme
 
 import androidx.navigation.compose.composable
 import androidx.compose.animation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.currentRecomposeScope
@@ -20,9 +22,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 
@@ -50,6 +56,23 @@ object Routes {
 }
 
 @Composable
+fun DynamicBackground(imageID: Int) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        Image(
+            painter = painterResource(id = imageID),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxSize()
+                .blur(2.dp)
+        )
+    }
+}
+
+@Composable
 fun BattleShipsApp() {
     val navController = rememberNavController()
     val playerViewModel = PlayerViewModel()
@@ -62,7 +85,6 @@ fun BattleShipsApp() {
         playerViewModel.localUserName = sharedPreferences.getString("playerName", null)
     }
 
-    HomeScreenBackground()
     NavHost(
         navController = navController,
         //startDestination = "game/96Rgrm2x9U0fCaTByQTF",
