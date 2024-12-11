@@ -21,11 +21,14 @@
     import androidx.compose.ui.unit.dp
 
     @Composable
-    fun Grid(board: Board, updateBoard: () -> Unit) {
+    fun Grid(board: Board) {
 
         var selectedBoat : Ship? by remember { mutableStateOf(null) }
         var offset by remember { mutableIntStateOf(0) }
         val context = LocalContext.current
+        val invalidCoordinates = board.getListOfInvalidCoordinates()
+        println(board.ships)
+        println(invalidCoordinates)
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(10),
@@ -33,7 +36,10 @@
         ) {
             items(100) { index ->
                 val coordinate = Coordinate(index/10, index%10)
-                GridItem(index, board.getState(coordinate)) {
+                val state = if (invalidCoordinates.contains(coordinate))
+                    BoardSquareState.HIT else board.getState(coordinate)
+
+                GridItem(index, state) {
                     //If null, try to select a new boat
                     if (selectedBoat == null)
                     {
@@ -50,30 +56,9 @@
                             selectedBoat!!.isVertical = !selectedBoat!!.isVertical
                         }
 
-                        selectedBoat?.moveShipTo(coordinate)
                         board.ships.remove(selectedBoat!!)
-
-                        if (!board.isShipValid(selectedBoat!!))
-                        {
-                            println("Ooops, pos is not valid...")
-                            Toast.makeText(
-                                context,
-                                "Cannot move boat, illegal position.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            if (pos == coordinate)
-                            {
-                                selectedBoat!!.isVertical = !selectedBoat!!.isVertical
-                            }
-                            selectedBoat?.moveShipTo(pos)
-                            board.ships.add(selectedBoat!!)
-                        }
-                        else
-                        {
-                            board.ships.add(selectedBoat!!)
-                        }
-
-                        updateBoard()
+                        selectedBoat?.moveShipTo(coordinate)
+                        board.ships.add(0, selectedBoat!!)
                         selectedBoat = null
                     }
                 }
@@ -88,6 +73,8 @@
 
         if (state == BoardSquareState.HIDDEN) {
             color = Color(173, 173, 227, 255)
+        } else if (state == BoardSquareState.HIT) {
+            color = Colors.hit
         } else {
             color = Color(99, 21, 206, 255)
         }
