@@ -77,9 +77,6 @@ class Board() {
         } ?: BoardSquareState.EMPTY
     }
 
-    //Attack a given square on the board.
-    //Returns true/false depending on of the attack was successful.
-    fun shoot(coordinate: Coordinate): Boolean {
         for (ship in ships) {
             if (ship.contains(coordinate)) {
 
