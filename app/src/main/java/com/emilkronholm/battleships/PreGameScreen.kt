@@ -1,5 +1,6 @@
 package com.emilkronholm.battleships
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,6 +32,7 @@ fun PreGameScreen(navController: NavController, playerViewModel: PlayerViewModel
 {
     val gameViewModel: GameViewModel = viewModel()
     val games by gameViewModel.gamesMap.asStateFlow().collectAsStateWithLifecycle()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         gameViewModel.observeGame(gameID, playerViewModel.localUserID)
@@ -59,6 +62,10 @@ fun PreGameScreen(navController: NavController, playerViewModel: PlayerViewModel
         navController.navigate(Routes.GAME + "/${gameID}")
     }
 
+    if (game.player1Ready && game.player2Ready) {
+        gameViewModel.startGame()
+    }
+
     var board by remember { mutableStateOf(Board()) }
     val isPlayer1 = playerViewModel.localUserID == game.player1ID
 
@@ -75,8 +82,7 @@ fun PreGameScreen(navController: NavController, playerViewModel: PlayerViewModel
             textAlign = TextAlign.Center,
             color = Color.White
         )
-        Grid(board, updateBoard = {}
-        )
+        Grid(board)
         Button(
             modifier = Modifier.width(300.dp),
             onClick = {
@@ -90,6 +96,16 @@ fun PreGameScreen(navController: NavController, playerViewModel: PlayerViewModel
         Button(
             modifier = Modifier.width(300.dp),
             onClick = {
+
+                if (!board.isValid()) {
+                    Toast.makeText(
+                        context,
+                        "Cannot be ready. The board contains invalid boats",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@Button
+                }
+
                 var newValue = true
                 if (isPlayer1) newValue = !game.player1Ready
                 if (!isPlayer1) newValue = !game.player2Ready
