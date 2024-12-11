@@ -1,18 +1,18 @@
 package com.emilkronholm.battleships
 
-import androidx.compose.foundation.BorderStroke
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
@@ -22,10 +22,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,13 +38,11 @@ import kotlinx.coroutines.flow.asStateFlow
 @Composable
 fun LobbyScreen(navController: NavController, playerViewModel: PlayerViewModel, modifier: Modifier = Modifier) {
     val challengeViewModel : ChallengeViewModel = viewModel()
-    val gameViewModel = GameViewModel()
+    val gameViewModel : GameViewModel = viewModel()
 
     val onlinePlayers by playerViewModel.players.asStateFlow().collectAsStateWithLifecycle()
     val challenges by challengeViewModel.challenges.asStateFlow().collectAsStateWithLifecycle()
     val games by gameViewModel.gamesMap.asStateFlow().collectAsStateWithLifecycle()
-
-    println(challenges.size)
 
     LaunchedEffect(Unit) {
         playerViewModel.scanForPlayers()
@@ -57,11 +52,16 @@ fun LobbyScreen(navController: NavController, playerViewModel: PlayerViewModel, 
 
     ChallengePopup(challenges, onlinePlayers, challengeViewModel, gameViewModel)
 
-    for (game in games) {
-        println("GAME JUST STARTED!!!")
-        //we have found a game oh yeah
-        navController.navigate(Routes.PRE_GAME+"/"+game.key)
+    LaunchedEffect(games) {
+        for (game in games) {
+            if (game.value.player1ID == playerViewModel.localUserID ||
+                game.value.player2ID == playerViewModel.localUserID) {
+                navController.navigate("${Routes.PRE_GAME}/${game.key}")
+            }
+        }
     }
+
+
 
     Column(
         modifier = Modifier
@@ -71,7 +71,7 @@ fun LobbyScreen(navController: NavController, playerViewModel: PlayerViewModel, 
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            "WELCOME, \n ${onlinePlayers[playerViewModel.localUserID]?.name}",
+            "WELCOME, \n ${playerViewModel.localUserName}",
             fontSize = 70.sp,
             fontFamily = PixelFont,
             lineHeight = 50.sp,
@@ -79,7 +79,7 @@ fun LobbyScreen(navController: NavController, playerViewModel: PlayerViewModel, 
             color = Color.White
         )
 
-        Text("Online Players", fontSize = 25.sp, color = Color.White)
+        Text("Online Players", fontFamily = PixelFont, fontSize = 25.sp, color = Color.White)
         HorizontalDivider(
             color = Color.White
         )
@@ -90,27 +90,30 @@ fun LobbyScreen(navController: NavController, playerViewModel: PlayerViewModel, 
 }
 
 @Composable
-fun FindGame(games: Map<String, Game>)
-{
-
-}
-
-@Composable
 fun OnlinePlayersLazyColumn(onlinePlayers: Map<String, Player>,playerViewModel: PlayerViewModel, challengeViewModel: ChallengeViewModel)
 {
-    LazyColumn (
-        modifier = Modifier.height(350.dp)
-    ) {
-        val playersList =  onlinePlayers.entries.toList()
-        items(playersList) { (playerID, player) ->
-            if (playerViewModel.localUserID != playerID) {
-                InviteRow(player, onClick = {
-                    challengeViewModel.createChallenge(
-                        playerID = playerViewModel.localUserID,
-                        opponentID = playerID
-                    )
-                })
+    if (onlinePlayers.isNotEmpty()) {
+        LazyColumn (
+            modifier = Modifier.height(350.dp)
+        ) {
+
+            val playersList =  onlinePlayers.entries.toList()
+            items(playersList) { (playerID, player) ->
+                if (playerViewModel.localUserID != playerID) {
+                    InviteRow(player, onClick = {
+                        challengeViewModel.createChallenge(
+                            playerID = playerViewModel.localUserID,
+                            opponentID = playerID
+                        )
+                    })
+                }
             }
+        }
+    }
+    else {
+        Box(Modifier.height(350.dp))
+        {
+            Text("Loading...", fontFamily = PixelFont, fontSize = 30.sp, color = Color.White)
         }
     }
 }
@@ -169,6 +172,7 @@ fun ChallengePopup(challenges : Map<String, Challenge>, onlinePlayers: Map<Strin
                     // Accept the challenge
                     challengeViewModel.acceptChallenge(challenge.key)
                     gameViewModel.createGame(challenge.value.recipient, challenge.value.challenger)
+                    gameViewModel.startScanForGames(challenge.value.recipient)
                 }) {
                     Text("Accept")
                 }
