@@ -55,6 +55,7 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
     val gameViewModel: GameViewModel = viewModel()
     val games by gameViewModel.gamesMap.asStateFlow().collectAsStateWithLifecycle()
     val context = LocalContext.current
+    var isMyTurn by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         gameViewModel.observeGame(gameID, playerViewModel.localUserID)
@@ -108,7 +109,13 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
 
         PlayerGrid(gameViewModel, if (isPlayer1) game.board1 else game.board2, onClick = { coordinate ->
 
-        })
+            if (isMyTurn) {
+                Box(
+                    modifier = Modifier.background(Color.Black.copy(alpha = 0.5f))
+                        .matchParentSize()
+                )
+            }
+        }
 
 
         //Resign button
