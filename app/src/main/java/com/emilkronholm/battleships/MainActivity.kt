@@ -54,38 +54,51 @@ fun BattleShipsApp() {
     val navController = rememberNavController()
     val playerViewModel = PlayerViewModel()
 
-    val sharedPreferences = LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
-    var username by remember { mutableStateOf("...") }
+    val sharedPreferences =
+        LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
 
     LaunchedEffect(Unit) {
         playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
-        playerViewModel.getName() { name ->
-            username = name
-        }
+        playerViewModel.localUserName = sharedPreferences.getString("playerName", null)
     }
 
     HomeScreenBackground()
     NavHost(
         navController = navController,
-        startDestination = "game/96Rgrm2x9U0fCaTByQTF",
-        //startDestination = Routes.HOME,
+        //startDestination = "game/96Rgrm2x9U0fCaTByQTF",
+        startDestination = Routes.HOME,
         enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
         exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) },
         popEnterTransition = { slideInHorizontally(initialOffsetX = { -1000 }) },
         popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
     ) {
-        composable(Routes.HOME) { HomeScreen(navController, playerViewModel) }
-        composable(Routes.ENTER_NAME) { EnterNameScreen(navController, playerViewModel) }
-        composable(Routes.LOBBY) { LobbyScreen(navController, playerViewModel) }
+        composable(Routes.HOME) {
+            DynamicBackground(R.drawable.nightbackground)
+            HomeScreen(navController, playerViewModel)
+        }
+        composable(Routes.ENTER_NAME) {
+            DynamicBackground(R.drawable.nightbackground)
+            EnterNameScreen(navController, playerViewModel)
+        }
+        composable(Routes.LOBBY) {
+            DynamicBackground(R.drawable.sunset)
+            LobbyScreen(navController, playerViewModel)
+        }
 
-        composable(Routes.PRE_GAME+"/{gameID}") { backStackEntry ->
+        composable(Routes.PRE_GAME + "/{gameID}") { backStackEntry ->
             val gameID = backStackEntry.arguments?.getString("gameID") ?: ""
+            DynamicBackground(R.drawable.sandybech)
             PreGameScreen(navController, playerViewModel, gameID)
         }
-        composable(Routes.GAME+"/{gameID}") { backStackEntry ->
+        composable(Routes.GAME + "/{gameID}") { backStackEntry ->
             val gameID = backStackEntry.arguments?.getString("gameID") ?: ""
+            DynamicBackground(R.drawable.sandybech)
             GameScreen(navController, playerViewModel, gameID)
         }
-        composable(Routes.POST_GAME) {  }
+        composable(Routes.POST_GAME + "{result}") { backStackEntry ->
+            val result = backStackEntry.arguments?.getString("result") ?: ""
+            DynamicBackground(R.drawable.sunset)
+            PostGameScreen(navController, result == "win")
+        }
     }
 }
