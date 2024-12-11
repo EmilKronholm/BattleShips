@@ -129,7 +129,7 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
                         .matchParentSize()
                 )
             }
-        })
+        }
 
         PlayerGrid(gameViewModel, if (isPlayer1) game.board1 else game.board2, onClick = { coordinate ->
 
