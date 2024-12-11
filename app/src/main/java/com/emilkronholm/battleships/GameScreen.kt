@@ -105,20 +105,29 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
         //horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ){
-        OpponentGrid(gameViewModel, if (isPlayer1) game.board2 else game.board1, onClick = { coordinate ->
-            //Player makes a move
-            //Is it players turn?
-            if ((isPlayer1 && game.gameState == GameState.PLAYER1_TURN) ||
-                (!isPlayer1 && game.gameState == GameState.PLAYER2_TURN)) {
-                gameViewModel.makeMove(coordinate, onError = {
-                    println("Something went wrong during move")
-                })
-            } else {
-                Toast.makeText(
-                    context,
-                    "Not your turn!",
-                    Toast.LENGTH_SHORT
-                ).show()
+        Box() {
+            OpponentGrid(gameViewModel, if (isPlayer1) game.board2 else game.board1, onClick = { coordinate ->
+                //Player makes a move
+                //Is it players turn?
+                if ((isPlayer1 && game.gameState == GameState.PLAYER1_TURN) ||
+                    (!isPlayer1 && game.gameState == GameState.PLAYER2_TURN)) {
+                    gameViewModel.makeMove(coordinate, onError = {
+                        println("Something went wrong during move")
+                    })
+                } else {
+                    Toast.makeText(
+                        context,
+                        "Not your turn!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
+
+            if (!isMyTurn) {
+                Box(
+                    modifier = Modifier.background(Color.Black.copy(alpha = 0.5f))
+                        .matchParentSize()
+                )
             }
         })
 
