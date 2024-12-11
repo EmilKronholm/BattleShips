@@ -76,6 +76,11 @@ class GameViewModel : ViewModel() {
         temp[index] = result
         val updatedBoard = updateForSunk(temp)
 
+        //Check if winner
+        if (isWinner(updatedBoard)) {
+            gameEngine.setGameState(currentGame.value!!.gameID, if (currentGame.value!!.isPlayer1) GameState.PLAYER1_WIN else GameState.PLAYER2_WIN)
+        }
+
         //Upload board
         gameEngine.uploadBoard(currentGame.value!!.gameID, !currentGame.value!!.isPlayer1, updatedBoard)
 
@@ -184,4 +189,13 @@ class GameViewModel : ViewModel() {
         return updatedList
     }
 
+    private fun isWinner(list: List<BoardSquareState>): Boolean {
+        for (square in list) {
+            if (square == BoardSquareState.HIDDEN) {
+                return false
+            }
+        }
+
+        return true
+    }
 }
