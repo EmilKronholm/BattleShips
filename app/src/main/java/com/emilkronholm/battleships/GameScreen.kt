@@ -82,6 +82,21 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
 
     var board by remember { mutableStateOf(Board()) }
     val isPlayer1 = playerViewModel.localUserID == game.player1ID
+    isMyTurn = if (isPlayer1) game.gameState == GameState.PLAYER1_TURN
+               else game.gameState == GameState.PLAYER2_TURN
+
+    //Check for winner
+    when (game.gameState) {
+        GameState.PLAYER1_WIN, GameState.PLAYER2_WIN -> {
+            val result = if (game.gameState == GameState.PLAYER1_WIN) isPlayer1 else !isPlayer1
+            navController.navigate(Routes.POST_GAME + if (result) "win" else "loose")
+        }
+
+        else -> {
+            //Noting dudu
+        }
+    }
+
     println("LocaluserID: ${playerViewModel.localUserID}")
     println("player1ID: ${game.player1ID}")
 
