@@ -38,7 +38,8 @@ class Board() {
         return null
     }
 
-    fun isShipValid(ship : Ship) : Boolean {
+    //Check if the given ship is valid for current board
+    private fun isShipValid(ship : Ship) : Boolean {
         for (part in ship.parts) {
             if (!(part.coordinate.x in 0 until size.x &&
                 part.coordinate.y in 0 until size.y)) {
