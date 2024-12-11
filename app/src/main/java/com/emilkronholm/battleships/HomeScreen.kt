@@ -35,23 +35,6 @@ import androidx.navigation.NavHostController
 
 val PixelFont = FontFamily(Font(R.font.pixel, FontWeight.Normal))
 
-
-
-@Composable
-fun HomeScreenBackground() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.nightbackground),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize().blur(2.dp)
-        )
-    }
-}
-
 @Composable
 fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, modifier: Modifier = Modifier) {
     val sharedPreferences = LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
