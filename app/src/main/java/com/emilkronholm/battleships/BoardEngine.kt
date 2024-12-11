@@ -77,6 +77,31 @@ class Board() {
         } ?: BoardSquareState.EMPTY
     }
 
+
+    //For every boat, we add all of its occupied squares (the body and surrounding parts)
+    //into a set, and if we have duplicates then we exit early and return false.
+    fun isValid(): Boolean {
+        val occupiedCoordinates = mutableSetOf<Coordinate>()
+        for (ship in ships) {
+            val allCoordinates = ship.parts.map { it.coordinate }
+
+            ship.getListOfSurroundingCoordinates().forEach { coordinate: Coordinate ->
+                if (occupiedCoordinates.contains(coordinate)) {
+                    return false
+                }
+            }
+
+            if (allCoordinates.any { !occupiedCoordinates.add(it) }) {
+                return false
+            }
+        }
+        return true
+    }
+
+    fun getListOfInvalidCoordinates(): List<Coordinate> {
+        val validCoordinates = mutableSetOf<Coordinate>()
+        val invalidCoordinates = mutableSetOf<Coordinate>()
+
         for (ship in ships) {
             if (ship.contains(coordinate)) {
 
