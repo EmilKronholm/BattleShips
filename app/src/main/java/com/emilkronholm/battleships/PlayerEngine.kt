@@ -49,11 +49,11 @@ class PlayerEngine {
             }
     }
 
-    fun getPlayerName(playerID: String, onSuccess : (String) -> Unit = {}, onFailure : (String) -> Unit = {})
+    fun getPlayerName(playerID: String, onSuccess : (String?) -> Unit = {}, onFailure : (String) -> Unit = {})
     {
         database.collection("players").document(playerID).get().
         addOnSuccessListener { player ->
-            onSuccess(player.toObject(Player::class.java)?.name?:"Null")
+            onSuccess(player.toObject(Player::class.java)?.name)
         }.addOnFailureListener { exception ->
             onFailure(exception.message.toString())
         }
