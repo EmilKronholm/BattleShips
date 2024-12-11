@@ -44,7 +44,7 @@ class GameEngine {
     private val database = Firebase.firestore
     private var listenerRegistration: ListenerRegistration? = null
 
-    fun scanForGamesForPlayer(playerID : String, onSuccess : (Map.Entry<String, Game>) -> Unit = {}, onFailure : (String) -> Unit = {})
+    fun scanForGamesForPlayer(playerID : String, onSuccess : (Map<String, Game>) -> Unit = {}, onFailure : (String) -> Unit = {})
     {
         listenerRegistration = database.collection("games")
             .whereEqualTo("gameState", GameState.PRE_GAME)
@@ -58,14 +58,7 @@ class GameEngine {
                     val allGamesMap = snapshot.documents.associate { doc ->
                         doc.id to doc.toObject(Game::class.java)!!
                     }
-
-                    for (game in allGamesMap) {
-                        if (game.value.player1ID == playerID || game.value.player2ID == playerID)
-                        {
-                            onSuccess(game)
-                            break
-                        }
-                    }
+                    onSuccess(allGamesMap)
                 }
             }
     }
