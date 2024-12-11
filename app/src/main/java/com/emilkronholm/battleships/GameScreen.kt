@@ -131,7 +131,10 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
             }
         }
 
-        PlayerGrid(gameViewModel, if (isPlayer1) game.board1 else game.board2, onClick = { coordinate ->
+        Box() {
+            PlayerGrid(gameViewModel, if (isPlayer1) game.board1 else game.board2, onClick = { coordinate ->
+
+            })
 
             if (isMyTurn) {
                 Box(
