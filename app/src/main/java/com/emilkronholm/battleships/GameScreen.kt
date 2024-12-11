@@ -158,10 +158,8 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
         var msg = ""
         print("isplayer1: ")
         println(isPlayer1)
-        if (isPlayer1) msg = if (game.gameState == GameState.PLAYER1_TURN) "Your turn" else "Waiting for opponent..."
-        if (!isPlayer1) msg = if (game.gameState == GameState.PLAYER2_TURN) "Your turn" else "Waiting for opponent..."
+        msg = if (isMyTurn) "Your turn" else "Waiting for opponent..."
         Text(msg, fontSize = 20.sp, fontFamily = PixelFont, color = Color.White)
-
     }
 }
 
