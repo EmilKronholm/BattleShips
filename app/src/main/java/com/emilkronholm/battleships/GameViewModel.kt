@@ -110,11 +110,10 @@ class GameViewModel : ViewModel() {
     }
 
     fun startScanForGames(playerID: String) {
-        gameEngine.scanForGamesForPlayer(playerID = playerID, onSuccess = { (gameID, game) ->
-            println("Callback for game in viewmodel")
-            gamesMap.value = mapOf("123" to Game())
-            gamesMap.value = mapOf(gameID to game)
-
+        gameEngine.scanForGamesForPlayer(playerID = playerID, onSuccess = { map ->
+            println("An update inside games occured")
+            println(map)
+            gamesMap.value = map
         })
 
     }
