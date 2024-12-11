@@ -3,12 +3,17 @@ package com.emilkronholm.battleships
 import androidx.compose.runtime.mutableStateListOf
 import kotlin.random.Random
 
-data class Coordinate(val x: Int, val y: Int)
+data class Coordinate(val x: Int, val y: Int) {
+    operator fun plus(offset: Coordinate): Coordinate {
+        return Coordinate(x + offset.x, y + offset.y)
+    }
+}
 
-//Board represents the state of the game
-//Contains ships
-//Responsible for calculating hit/miss
-//Litterly the brain of the game oh yeah
+data class ShipInfo (
+            val ship: Ship,
+            val headPos: Coordinate
+)
+
 class Board() {
     var ships = mutableStateListOf<Ship>()
     val size = Coordinate(10, 10)
@@ -27,12 +32,12 @@ class Board() {
         }
     }
 
-    fun getShipAt(coordinate : Coordinate) : Ship? {
+    fun getShipAt(coordinate : Coordinate) : ShipInfo? {
         for (ship in ships)
         {
             if (ship.contains(coordinate))
             {
-                return ship;
+                return ShipInfo(ship, ship.parts[0].coordinate)
             }
         }
         return null
@@ -169,6 +174,11 @@ class Ship(position: Coordinate, var isVertical: Boolean, val length: Int) {
 
     fun moveShipTo(position: Coordinate) {
         updatePosition(position, isVertical, length);
+    }
+
+    fun rotate() {
+        isVertical = !isVertical
+        updatePosition(parts[0].coordinate, isVertical, length);
     }
 }
 
