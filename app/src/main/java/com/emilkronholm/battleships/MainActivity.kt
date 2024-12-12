@@ -1,7 +1,9 @@
 package com.emilkronholm.battleships
 
 import android.content.Context
+import android.media.MediaPlayer
 import android.os.Bundle
+import android.provider.MediaStore.Audio.Media
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -16,6 +18,7 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
@@ -67,7 +70,7 @@ fun DynamicBackground(imageID: Int) {
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxSize()
-                .blur(2.dp)
+                .blur(0.dp)
         )
     }
 }
@@ -76,13 +79,46 @@ fun DynamicBackground(imageID: Int) {
 fun BattleShipsApp() {
     val navController = rememberNavController()
     val playerViewModel = PlayerViewModel()
-
+    val context = LocalContext.current
+    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
     val sharedPreferences =
         LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
 
     LaunchedEffect(Unit) {
         playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
         playerViewModel.localUserName = sharedPreferences.getString("playerName", null)
+    }
+
+    val updateMediaPlayer: (Int) -> Unit = { newSoundResId ->
+        mediaPlayer?.let {
+            if (it.isPlaying) it.stop()
+            it.release()
+        }
+        mediaPlayer = MediaPlayer.create(context, newSoundResId).apply {
+            isLooping = true
+            start()
+        }
+    }
+
+    LaunchedEffect(navController) {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.route) {
+                Routes.HOME -> updateMediaPlayer(R.raw.lobbytheme)
+                Routes.LOBBY -> updateMediaPlayer(R.raw.lobbytheme)
+                "${Routes.PRE_GAME}/{gameID}" -> updateMediaPlayer(R.raw.maintheme)
+                "${Routes.GAME}/{gameID}" -> updateMediaPlayer(R.raw.maintheme)
+                "${Routes.POST_GAME}{result}" -> updateMediaPlayer(R.raw.lobbytheme)
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            mediaPlayer?.let {
+                if (it.isPlaying) it.stop()
+                it.release()
+            }
+        }
     }
 
     NavHost(
@@ -109,12 +145,12 @@ fun BattleShipsApp() {
 
         composable(Routes.PRE_GAME + "/{gameID}") { backStackEntry ->
             val gameID = backStackEntry.arguments?.getString("gameID") ?: ""
-            DynamicBackground(R.drawable.sandybech)
+            DynamicBackground(R.drawable.lighthouse)
             PreGameScreen(navController, playerViewModel, gameID)
         }
         composable(Routes.GAME + "/{gameID}") { backStackEntry ->
             val gameID = backStackEntry.arguments?.getString("gameID") ?: ""
-            DynamicBackground(R.drawable.sandybech)
+            DynamicBackground(R.drawable.lighthouse)
             GameScreen(navController, playerViewModel, gameID)
         }
         composable(Routes.POST_GAME + "{result}") { backStackEntry ->
