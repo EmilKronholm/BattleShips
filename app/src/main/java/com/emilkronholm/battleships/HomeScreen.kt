@@ -43,7 +43,8 @@ fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, m
     LaunchedEffect(Unit) {
         //Load last userID and userName from sharedPreferences
         playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
-        username = sharedPreferences.getString("playerName", null)
+        playerViewModel.localUserName = sharedPreferences.getString("playerName", null)
+        username = playerViewModel.localUserName
     }
 
     Column(
@@ -145,8 +146,11 @@ fun EnterNameScreen(navController: NavController, playerViewModel: PlayerViewMod
                     inputName,
                     onSuccess = { id ->
                         playerViewModel.localUserID = id
+                        playerViewModel.localUserName = inputName
+
                         sharedPreferences.edit().putString("playerId", id).apply()
                         sharedPreferences.edit().putString("playerName", inputName).apply()
+
                         navController.navigate(Routes.LOBBY) {
                             popUpTo(navController.graph.startDestinationId) {
                                 inclusive = true
