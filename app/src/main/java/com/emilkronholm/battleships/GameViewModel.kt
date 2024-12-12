@@ -45,6 +45,26 @@ class GameViewModel : ViewModel() {
         )
     }
 
+    fun getCurrentGame(): Game {
+        return gamesMap.value[currentGame.value!!.gameID]!!
+    }
+
+    fun isMyTurn(): Boolean {
+        when (gamesMap.value[currentGame.value!!.gameID]!!.gameState) {
+            GameState.PLAYER1_TURN -> {
+                return currentGame.value!!.isPlayer1
+            }
+            GameState.PLAYER2_TURN -> {
+                return !currentGame.value!!.isPlayer1
+            }
+            else -> return false
+        }
+    }
+
+    fun isPlayer1():Boolean {
+        return currentGame.value!!.isPlayer1
+    }
+
     // Start the game
     fun startGame() {
         gameEngine.setGameState(currentGame.value!!.gameID, GameState.PLAYER1_TURN)
@@ -197,5 +217,11 @@ class GameViewModel : ViewModel() {
         }
 
         return true
+    }
+
+    fun getOpponentID(): String {
+        val isPlayer1 = currentGame.value!!.isPlayer1
+        val game = gamesMap.value[currentGame.value!!.gameID]
+        return if (isPlayer1) game!!.player2ID else game!!.player1ID
     }
 }
