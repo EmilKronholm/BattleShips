@@ -19,17 +19,7 @@ class Board() {
     val size = Coordinate(10, 10)
 
     init {
-        for (x in arrayOf(1, 1, 2, 2, 3, 4)) {
-            while (true) {
-                val pos = Coordinate(Random.nextInt(0, 10), Random.nextInt(0, 10))
-                val newShip = Ship(pos, Random.nextInt(0, 2) % 2 == 0, x)
-
-                if (isShipValid(newShip)) {
-                    ships.add(newShip)
-                    break
-                }
-            }
-        }
+        shuffle()
     }
 
     fun getShipAt(coordinate : Coordinate) : ShipInfo? {
@@ -123,6 +113,21 @@ class Board() {
             }
         }
         return invalidCoordinates.toList()
+    }
+
+    fun shuffle() {
+        ships.clear()
+        for (x in arrayOf(1, 1, 2, 2, 3, 4)) {
+            while (true) {
+                val pos = Coordinate(Random.nextInt(0, 10), Random.nextInt(0, 10))
+                val newShip = Ship(pos, Random.nextInt(0, 2) % 2 == 0, x)
+
+                if (isShipValid(newShip)) {
+                    ships.add(newShip)
+                    break
+                }
+            }
+        }
     }
 }
 
