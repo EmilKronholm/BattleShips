@@ -2,7 +2,6 @@ package com.emilkronholm.battleships
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -106,7 +105,7 @@ fun PreGameScreen(navController: NavController, playerViewModel: PlayerViewModel
             textAlign = TextAlign.Center,
             color = Color.White
         )
-        Grid(board, onMove = {
+        PreGameGrid(board, onMove = {
             gameViewModel.setPlayerReady(false)
         })
         Button(

@@ -1,6 +1,7 @@
 package com.emilkronholm.battleships
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,31 +25,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.packInts
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.asStateFlow
-
-object VerboseColors {
-    val empty =  Color(99, 21, 206, 255)
-    val hidden = Color(173, 173, 227, 255)
-    val hit = Color(236, 0, 111, 255)
-    val missed = Color(18, 18, 23, 255)
-    val sunk = Color(93, 0, 0, 255)
-}
-
-object Colors {
-    val empty =  Color(99, 21, 206, 255)
-    val hidden = Color(99, 21, 206, 255)
-    val hit = Color(236, 0, 111, 255)
-    val missed = Color(18, 18, 23, 255)
-    val sunk = Color(93, 0, 0, 255)
-}
 
 @Composable
 fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, gameID: String) {
@@ -140,6 +130,7 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
                 Box(
                     modifier = Modifier.background(Color.Black.copy(alpha = 0.5f))
                         .matchParentSize()
+                        .padding(8.dp)
                 )
             }
         }
@@ -200,32 +191,22 @@ fun OpponentGrid(gameViewModel: GameViewModel, list: List<BoardSquareState>, onC
 
 @Composable
 fun GridItemPlaying(index: Int, state : BoardSquareState, isVerbose: Boolean = true, onClick: () -> Unit) {
-    var status by remember { mutableStateOf(false) }
-    var color by remember { mutableStateOf(Color.Red) }
+    var imageID = 0
+    var icon = ""
 
     if (isVerbose) {
-        if (state == BoardSquareState.HIT) {
-            color = VerboseColors.hit
-        } else if (state == BoardSquareState.EMPTY) {
-            color = VerboseColors.empty
-        } else if (state == BoardSquareState.HIDDEN) {
-            color = VerboseColors.hidden
-        } else if (state == BoardSquareState.SUNK) {
-            color = VerboseColors.sunk
-        } else if (state == BoardSquareState.MISSED) {
-            color = VerboseColors.missed
+        when (state) {
+            BoardSquareState.HIDDEN, BoardSquareState.HIT, BoardSquareState.SUNK ->
+                imageID = R.drawable.metal_tile
+            BoardSquareState.EMPTY, BoardSquareState.MISSED ->
+                imageID = R.drawable.water_tile
         }
     } else {
-        if (state == BoardSquareState.HIT) {
-            color = Colors.hit
-        } else if (state == BoardSquareState.EMPTY) {
-            color = Colors.empty
-        } else if (state == BoardSquareState.HIDDEN) {
-            color = Colors.hidden
-        } else if (state == BoardSquareState.SUNK) {
-            color = Colors.sunk
-        } else if (state == BoardSquareState.MISSED) {
-            color = Colors.missed
+        when (state) {
+            BoardSquareState.SUNK ->
+                imageID = R.drawable.metal_tile
+            else ->
+                imageID = R.drawable.water_tile
         }
     }
 
@@ -233,11 +214,26 @@ fun GridItemPlaying(index: Int, state : BoardSquareState, isVerbose: Boolean = t
         modifier = Modifier
             .fillMaxWidth(0.05f)
             .aspectRatio(1f)
-            .padding(2.dp)
-            .background(color)
-            .clickable {
-                onClick()
-            }
-    )
+            .padding(1.dp)
+            .clickable { onClick() }
+    ) {
+        Image(
+            painter = painterResource(id = imageID),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxSize()
+                .blur(0.5.dp)
+        )
+
+        if (state == BoardSquareState.MISSED){
+            Text("¤", fontFamily = PixelFont, fontSize = 40.sp, color = Color.Black, modifier = Modifier.align(Alignment.Center))
+        }
+        if (state == BoardSquareState.HIT || state == BoardSquareState.SUNK){
+            Text("X", fontFamily = PixelFont, fontSize = 40.sp, color = Color.Red, modifier = Modifier.align(Alignment.Center))
+        }
+
+
+    }
 }
 

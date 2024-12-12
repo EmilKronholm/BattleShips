@@ -10,7 +10,6 @@
     import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
     import androidx.compose.runtime.Composable
     import androidx.compose.runtime.getValue
-    import androidx.compose.runtime.mutableIntStateOf
     import androidx.compose.runtime.mutableStateOf
     import androidx.compose.runtime.remember
     import androidx.compose.runtime.setValue
@@ -24,12 +23,11 @@
     import androidx.compose.ui.layout.ContentScale
     import androidx.compose.ui.layout.boundsInRoot
     import androidx.compose.ui.layout.onGloballyPositioned
-    import androidx.compose.ui.platform.LocalConfiguration
     import androidx.compose.ui.res.painterResource
     import androidx.compose.ui.unit.dp
 
     @Composable
-    fun Grid(board: Board, onMove: () -> Unit) {
+    fun PreGameGrid(board: Board, onMove: () -> Unit) {
 
         var selectedBoat : Ship? by remember { mutableStateOf(null) }
         var offset by remember { mutableStateOf(Coordinate(0, 0)) }
@@ -111,29 +109,25 @@
                     }
                 })
             {
+
+            val listOfInvalidCoordinates = board.getListOfInvalidCoordinates()
             items(100) { index ->
                 val coordinate = Coordinate(index%10, index/10)
+                val state = board.getState(coordinate)
+                val imageID =
 
-                GridItem(index, board.getState(coordinate), invalidCoordinates.contains(coordinate))
+
+                GridItem(
+                    imageID = if (state == BoardSquareState.HIDDEN) R.drawable.metal_tile
+                            else R.drawable.water_tile,
+                    isError = listOfInvalidCoordinates.contains(coordinate)
+                )
             }
         }
     }
 
     @Composable
-    fun GridItem(index: Int, state : BoardSquareState, isError: Boolean, modifier: Modifier = Modifier) {
-        var status by remember { mutableStateOf(false) }
-        var color by remember { mutableStateOf(Color.Transparent) }
-        var id by remember { mutableIntStateOf(0) }
-
-        if (state == BoardSquareState.HIDDEN) {
-            id = R.drawable.metal_tile
-        }
-        else {
-            id = R.drawable.water_tile
-        }
-
-        color = if (isError) Color.Red else Color.Transparent
-
+    fun GridItem(imageID: Int = 0, isError: Boolean = false) {
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.05f)
@@ -142,7 +136,7 @@
         ) {
 
             Image(
-                painter = painterResource(id = id),
+                painter = painterResource(id = imageID),
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -152,7 +146,7 @@
             if (isError) {
                 Box (
                     modifier = Modifier.fillMaxSize()
-                        .background(color.copy(alpha = 0.5f))
+                        .background(Color.Red.copy(alpha = 0.5f))
                 )
             }
 
