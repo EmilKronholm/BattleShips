@@ -86,7 +86,10 @@ class Board() {
                 }
             }
 
-            if (allCoordinates.any { !occupiedCoordinates.add(it) }) {
+            if (allCoordinates.any {
+                !occupiedCoordinates.add(it) ||
+                        (it.x < 0 || it.x > 9 || it.y < 0 || it.y > 9)
+            }) {
                 return false
             }
         }
@@ -109,7 +112,8 @@ class Board() {
             }
 
             allCoordinates.forEach { coordinate ->
-                if (!validCoordinates.add((coordinate))) {
+                if (!validCoordinates.add((coordinate))
+                    || (coordinate.x < 0 || coordinate.x > 9 || coordinate.y < 0 || coordinate.y > 9)) {
                     for (part in ship.parts) {
                         invalidCoordinates.add(part.coordinate)
                     }
