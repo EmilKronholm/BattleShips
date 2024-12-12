@@ -114,34 +114,8 @@
             {
             items(100) { index ->
                 val coordinate = Coordinate(index%10, index/10)
-                val state = if (invalidCoordinates.contains(coordinate))
-                    BoardSquareState.HIT else board.getState(coordinate)
 
-                GridItem(index, state) {
-
-
-//                    //If null, try to select a new boat
-//                    if (selectedBoat == null)
-//                    {
-//                        selectedBoat = board.getShipAt(coordinate)
-//                        println("Tried to get boat at $coordinate")
-//                    }
-//                    //If not null, try to move selected boat
-//                    else
-//                    {
-//                        val pos = selectedBoat!!.parts[0].coordinate
-//
-//                        if (pos == coordinate)
-//                        {
-//                            selectedBoat!!.isVertical = !selectedBoat!!.isVertical
-//                        }
-//
-//                        board.ships.remove(selectedBoat!!)
-//                        selectedBoat?.moveShipTo(coordinate)
-//                        board.ships.add(0, selectedBoat!!)
-//                        selectedBoat = null
-//                    }
-                }
+                GridItem(index, board.getState(coordinate), invalidCoordinates.contains(coordinate))
             }
         }
     }
