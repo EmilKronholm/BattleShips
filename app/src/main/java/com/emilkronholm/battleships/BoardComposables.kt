@@ -121,27 +121,41 @@
     }
 
     @Composable
-    fun GridItem(index: Int, state : BoardSquareState, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    fun GridItem(index: Int, state : BoardSquareState, isError: Boolean, modifier: Modifier = Modifier) {
         var status by remember { mutableStateOf(false) }
-        var color by remember { mutableStateOf(Color.Red) }
+        var color by remember { mutableStateOf(Color.Transparent) }
+        var id by remember { mutableIntStateOf(0) }
 
         if (state == BoardSquareState.HIDDEN) {
-            color = Color(173, 173, 227, 255)
-        } else if (state == BoardSquareState.HIT) {
-            color = Colors.hit
-        } else {
-            color = Color(99, 21, 206, 255)
+            id = R.drawable.metal_tile
         }
+        else {
+            id = R.drawable.water_tile
+        }
+
+        color = if (isError) Color.Red else Color.Transparent
 
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.05f)
                 .aspectRatio(1f)
-                .padding(2.dp)
-                .background(color)
+                .padding(1.dp)
+        ) {
 
-//                .clickable {
-//                    onClick()
-//                }
-        )
+            Image(
+                painter = painterResource(id = id),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(0.5.dp)
+            )
+            if (isError) {
+                Box (
+                    modifier = Modifier.fillMaxSize()
+                        .background(color.copy(alpha = 0.5f))
+                )
+            }
+
+        }
     }
