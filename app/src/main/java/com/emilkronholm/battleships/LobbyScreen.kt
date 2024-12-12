@@ -3,6 +3,7 @@ package com.emilkronholm.battleships
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,11 +11,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
@@ -30,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -154,36 +159,130 @@ fun InviteRow(player: Player, modifier: Modifier = Modifier, onClick : () -> Uni
 }
 
 @Composable
+fun PopUp(
+    title: String,
+    message: String,
+    onDismiss: () -> Unit = {},
+    onConfirm: () -> Unit = {},
+    isPrompt: Boolean = true
+) {
+    Dialog(onDismissRequest = { onDismiss() }) {
+        // The popup content
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(250,250, 250, 220), shape = RoundedCornerShape(4.dp))
+                .padding(16.dp)
+        ) {
+            if (isPrompt) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .clickable { onDismiss() }
+                        .padding(8.dp)
+                ) {
+                    Text("X", fontFamily = PixelFont, fontSize = 20.sp)
+                }
+            }
+
+            Column (
+                modifier = Modifier.padding(top=14.dp)
+            ){
+                Text(title, fontFamily = PixelFont, fontSize = 30.sp)
+                Text(message, fontFamily = PixelFont, fontSize = 19.sp, modifier = Modifier.padding(vertical = 8.dp))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.align(Alignment.Start)
+                ) {
+
+
+                    Button(
+                        onClick = { onConfirm() },
+                        colors = ButtonColors(
+                            contentColor = Color.White,
+                            containerColor = Color.Green,
+                            disabledContentColor = Color.Transparent,
+                            disabledContainerColor = Color.Transparent
+                        )
+                    ) {
+                        Text(if (isPrompt) "Confirm" else "OK", fontFamily = PixelFont, fontSize = 18.sp)
+                    }
+
+                    if (isPrompt) {
+                        Button(
+                            onClick = { onDismiss() },
+                            colors = ButtonColors(
+                                contentColor = Color.White,
+                                containerColor = Color.Red,
+                                disabledContentColor = Color.Transparent,
+                                disabledContainerColor = Color.Transparent
+                            )
+                        ) {
+                            Text("Dismiss", fontFamily = PixelFont, fontSize = 18.sp)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
 fun ChallengePopup(challenges : Map<String, Challenge>, onlinePlayers: Map<String, Player>, challengeViewModel: ChallengeViewModel, gameViewModel: GameViewModel) {
     challenges.forEach { challenge ->
-        AlertDialog(
-            onDismissRequest = {
+        val playerName = onlinePlayers[challenge.value.challenger]?.name
+        PopUp(
+            title = "New challenge",
+            message = "$playerName has challenged you to a game!",
+            onDismiss = {
                 challengeViewModel.declineChallenge(
                     challenge.key
                 )
             },
-            title = { Text("New Challenge!") },
-            text = {
-                val playerName = onlinePlayers[challenge.value.challenger]?.name
-                Text("$playerName has challenged you to a game!")
-            },
-            confirmButton = {
-                Button(onClick = {
-                    // Accept the challenge
-                    challengeViewModel.acceptChallenge(challenge.key)
-                    gameViewModel.createGame(challenge.value.recipient, challenge.value.challenger)
-                    gameViewModel.startScanForGames(challenge.value.recipient)
-                }) {
-                    Text("Accept")
-                }
-            },
-            dismissButton = {
-                Button(onClick = {
-                    challengeViewModel.declineChallenge(challenge.key)
-                }) {
-                    Text("Decline")
-                }
+            onConfirm = {
+                // Accept the challenge
+                challengeViewModel.acceptChallenge(challenge.key)
+                gameViewModel.createGame(challenge.value.recipient, challenge.value.challenger)
+//                gameViewModel.startScanForGames(challenge.value.recipient)
             }
         )
     }
+
 }
+
+//@Composable
+//fun ChallengePopup(challenges : Map<String, Challenge>, onlinePlayers: Map<String, Player>, challengeViewModel: ChallengeViewModel, gameViewModel: GameViewModel) {
+//    challenges.forEach { challenge ->
+//        AlertDialog(
+//            onDismissRequest = {
+//                challengeViewModel.declineChallenge(
+//                    challenge.key
+//                )
+//            },
+//            title = { Text("New Challenge!") },
+//            text = {
+//                val playerName = onlinePlayers[challenge.value.challenger]?.name
+//                Text("$playerName has challenged you to a game!")
+//            },
+//            confirmButton = {
+//                Button(onClick = {
+//                    // Accept the challenge
+//                    challengeViewModel.acceptChallenge(challenge.key)
+//                    gameViewModel.createGame(challenge.value.recipient, challenge.value.challenger)
+//                    gameViewModel.startScanForGames(challenge.value.recipient)
+//                }) {
+//                    Text("Accept")
+//                }
+//            },
+//            dismissButton = {
+//                Button(onClick = {
+//                    challengeViewModel.declineChallenge(challenge.key)
+//                }) {
+//                    Text("Decline")
+//                }
+//            }
+//        )
+//    }
+//}
