@@ -1,6 +1,7 @@
     package com.emilkronholm.battleships
     import androidx.compose.foundation.Image
     import androidx.compose.foundation.background
+    import androidx.compose.foundation.border
     import androidx.compose.foundation.layout.Box
     import androidx.compose.foundation.layout.aspectRatio
     import androidx.compose.foundation.layout.fillMaxSize
@@ -39,10 +40,11 @@
             columns = GridCells.Fixed(10),
             modifier = Modifier
                 .padding(8.dp)
-                .background(Color(67, 113, 173, 138))
+                .background(Color(58, 123, 224, 255))
                 .onGloballyPositioned { layoutCoordinates ->
                     rect = layoutCoordinates.boundsInRoot()
                 }
+                .border(2.dp, Color(44, 79, 138))
                 .pointerInput(Unit) {
                     awaitPointerEventScope {
 
@@ -53,9 +55,6 @@
                             val currentPosition = event.changes.first().position
 
                             when {
-                                event.changes.any { it.changedToDown() } -> {
-
-                                }
                                 event.changes.any { it.changedToUp() } -> {
                                     //Rotate boat if...
                                     if (!hasMoved) {
@@ -82,7 +81,6 @@
                                     val y = (currentPosition.y / (rect.size.height / 10)).toInt()
                                     val coordinate = Coordinate(x, y)
 
-                                    println("Dragging at grid coordinates: $coordinate")
 
                                     if (selectedBoat != null && selectedBoat!!.parts[0].coordinate != coordinate + offset) {
                                         hasMoved = true
@@ -90,7 +88,7 @@
                                         selectedBoat?.moveShipTo(coordinate + offset)
                                         board.ships.add(0, selectedBoat!!)
                                         onMove()
-                                        println("Boat moved to $coordinate")
+
                                     } else {
                                         val selectedShipInfo = board.getShipAt(coordinate)
                                         selectedBoat = selectedShipInfo?.ship
@@ -100,7 +98,6 @@
                                             } else {
                                                 Coordinate(selectedShipInfo.headPos.x - x, 0)
                                             }
-                                            println("Boat selected: $selectedBoat")
                                         }
                                     }
                                 }
