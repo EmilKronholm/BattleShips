@@ -1,11 +1,9 @@
     package com.emilkronholm.battleships
-    import android.widget.Toast
+    import androidx.compose.foundation.Image
     import androidx.compose.foundation.background
-    import androidx.compose.foundation.clickable
-    import androidx.compose.foundation.gestures.detectDragGestures
-    import androidx.compose.foundation.gestures.detectTapGestures
     import androidx.compose.foundation.layout.Box
     import androidx.compose.foundation.layout.aspectRatio
+    import androidx.compose.foundation.layout.fillMaxSize
     import androidx.compose.foundation.layout.fillMaxWidth
     import androidx.compose.foundation.layout.padding
     import androidx.compose.foundation.lazy.grid.GridCells
@@ -17,41 +15,40 @@
     import androidx.compose.runtime.remember
     import androidx.compose.runtime.setValue
     import androidx.compose.ui.Modifier
+    import androidx.compose.ui.draw.blur
     import androidx.compose.ui.geometry.Rect
     import androidx.compose.ui.graphics.Color
     import androidx.compose.ui.input.pointer.changedToDown
     import androidx.compose.ui.input.pointer.changedToUp
     import androidx.compose.ui.input.pointer.pointerInput
+    import androidx.compose.ui.layout.ContentScale
     import androidx.compose.ui.layout.boundsInRoot
     import androidx.compose.ui.layout.onGloballyPositioned
     import androidx.compose.ui.platform.LocalConfiguration
-    import androidx.compose.ui.platform.LocalContext
+    import androidx.compose.ui.res.painterResource
     import androidx.compose.ui.unit.dp
 
     @Composable
-    fun Grid(board: Board) {
+    fun Grid(board: Board, onMove: () -> Unit) {
 
         var selectedBoat : Ship? by remember { mutableStateOf(null) }
         var offset by remember { mutableStateOf(Coordinate(0, 0)) }
         val invalidCoordinates = board.getListOfInvalidCoordinates()
-        println(board.ships)
-        println(invalidCoordinates)
 
-        val configuration = LocalConfiguration.current
         var rect : Rect = Rect(0f, 0f, 0f, 0f)
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(10),
             modifier = Modifier
                 .padding(8.dp)
-                .background(Color(70, 21, 100, 200))
+                .background(Color(67, 113, 173, 138))
                 .onGloballyPositioned { layoutCoordinates ->
                     rect = layoutCoordinates.boundsInRoot()
                 }
                 .pointerInput(Unit) {
                     awaitPointerEventScope {
 
-                        var hasMoved = false;
+                        var hasMoved = false
 
                         while (true) {
                             val event = awaitPointerEvent()
@@ -74,6 +71,7 @@
                                             board.ships.remove(ship.ship)
                                             ship.ship.rotate()
                                             board.ships.add(0, ship.ship)
+                                            onMove()
                                         }
                                     }
 
@@ -93,6 +91,7 @@
                                         board.ships.remove(selectedBoat!!)
                                         selectedBoat?.moveShipTo(coordinate + offset)
                                         board.ships.add(0, selectedBoat!!)
+                                        onMove()
                                         println("Boat moved to $coordinate")
                                     } else {
                                         val selectedShipInfo = board.getShipAt(coordinate)
