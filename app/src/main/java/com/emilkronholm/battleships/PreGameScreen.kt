@@ -2,12 +2,14 @@ package com.emilkronholm.battleships
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -21,7 +23,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -62,12 +63,35 @@ fun PreGameScreen(navController: NavController, playerViewModel: PlayerViewModel
         navController.navigate(Routes.GAME + "/${gameID}")
     }
 
+    if (game.gameState == GameState.PLAYER2_WIN || game.gameState == GameState.PLAYER1_WIN) {
+        navController.navigate(Routes.LOBBY) {
+            popUpTo(navController.graph.startDestinationId) {
+                inclusive = true
+            }
+        }
+    }
+
     if (game.player1Ready && game.player2Ready) {
         gameViewModel.startGame()
     }
 
     var board by remember { mutableStateOf(Board()) }
     val isPlayer1 = playerViewModel.localUserID == game.player1ID
+
+    Button(
+        modifier = Modifier.padding(20.dp),
+        colors = ButtonColors(
+            contentColor = Color.White,
+            containerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            disabledContentColor = Color.Transparent
+        ),
+        onClick = {
+            gameViewModel.resignGame()
+        }
+    ) {
+        Text("Abandon game", fontSize = 20.sp, fontFamily = PixelFont, color = Color.White)
+    }
 
     Column (
         modifier = Modifier.fillMaxSize(),
@@ -82,22 +106,36 @@ fun PreGameScreen(navController: NavController, playerViewModel: PlayerViewModel
             textAlign = TextAlign.Center,
             color = Color.White
         )
-        Grid(board)
+        Grid(board, onMove = {
+            gameViewModel.setPlayerReady(false)
+        })
         Button(
             modifier = Modifier.width(300.dp),
             onClick = {
-                board = Board()
+                //Shuffle board
+                board.shuffle()
             }
         ) {
 
             Text("Shuffle", fontSize = 20.sp, fontFamily = PixelFont)
         }
 
+        val isBoardValid = board.isValid()
+        var buttonColor = Color.Black
+        if (isPlayer1) buttonColor = if (game.player1Ready) Color.Green else Color.Red
+        if (!isPlayer1) buttonColor = if (game.player2Ready) Color.Green else Color.Red
         Button(
+            colors = ButtonColors(
+                containerColor = buttonColor,
+                disabledContainerColor = Color(70, 0, 0, 200),
+                contentColor = Color.White,
+                disabledContentColor = Color.Gray
+            ),
             modifier = Modifier.width(300.dp),
+            enabled = isBoardValid,
             onClick = {
 
-                if (!board.isValid()) {
+                if (!isBoardValid) {
                     Toast.makeText(
                         context,
                         "Cannot be ready. The board contains invalid boats",
