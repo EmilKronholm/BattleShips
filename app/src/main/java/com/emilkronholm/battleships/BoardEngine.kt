@@ -102,13 +102,17 @@ class Board() {
 
             ship.getListOfSurroundingCoordinates().forEach { coordinate: Coordinate ->
                 if (validCoordinates.contains(coordinate)) {
-                    invalidCoordinates.add(coordinate)
+                    for (part in ship.parts) {
+                        invalidCoordinates.add(part.coordinate)
+                    }
                 }
             }
 
             allCoordinates.forEach { coordinate ->
                 if (!validCoordinates.add((coordinate))) {
-                    invalidCoordinates.add(coordinate)
+                    for (part in ship.parts) {
+                        invalidCoordinates.add(part.coordinate)
+                    }
                 }
             }
         }
