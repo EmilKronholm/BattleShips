@@ -2,6 +2,7 @@ package com.emilkronholm.battleships
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -19,7 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -77,19 +80,26 @@ fun PreGameScreen(navController: NavController, playerViewModel: PlayerViewModel
     var board by remember { mutableStateOf(Board()) }
     val isPlayer1 = playerViewModel.localUserID == game.player1ID
 
-    Button(
-        modifier = Modifier.padding(20.dp),
-        colors = ButtonColors(
-            contentColor = Color.White,
-            containerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            disabledContentColor = Color.Transparent
-        ),
-        onClick = {
-            gameViewModel.resignGame()
-        }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-        Text("Abandon game", fontSize = 20.sp, fontFamily = PixelFont, color = Color.White)
+        Button(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp, end = 8.dp),
+            colors = ButtonColors(
+                contentColor = Color.White,
+                containerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                disabledContentColor = Color.Transparent
+            ),
+            onClick = {
+                gameViewModel.resignGame()
+            }
+        ) {
+            Text("Abandon game", fontSize = 25.sp, fontFamily = PixelFont, color = Color.White, textDecoration = TextDecoration.Underline)
+        }
     }
 
     Column (
