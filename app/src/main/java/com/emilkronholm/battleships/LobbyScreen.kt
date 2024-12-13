@@ -146,7 +146,7 @@ fun InviteRow(player: Player, modifier: Modifier = Modifier, onClick : () -> Uni
                 onClick()
             },
             colors = ButtonColors(
-                containerColor = Color.White,
+                containerColor = Color.White.copy(alpha = 0.7f),
                 disabledContentColor = Color.Black,
                 disabledContainerColor = Color.Gray,
                 contentColor = Color.Black
@@ -157,7 +157,7 @@ fun InviteRow(player: Player, modifier: Modifier = Modifier, onClick : () -> Uni
                 contentDescription = "Invite-Logo",
                 modifier = Modifier.size(18.dp)
             )
-            Text("Battle")
+            Text("Battle", fontFamily = PixelFont, fontSize = 20.sp)
         }
     }
 }
