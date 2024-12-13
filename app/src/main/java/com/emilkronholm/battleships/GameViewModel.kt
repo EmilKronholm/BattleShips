@@ -71,7 +71,7 @@ class GameViewModel : ViewModel() {
     }
 
     // Handle player moves
-    fun makeMove(square: Coordinate, onError: (String) -> Unit) {
+    fun makeMove(square: Coordinate, onError: (String) -> Unit, onResult: (BoardSquareState) -> Unit) {
             //Is the move a valid move?
         val _game = gamesMap.value[currentGame.value!!.gameID]!!
         val board = if (currentGame.value!!.isPlayer1)
@@ -90,6 +90,8 @@ class GameViewModel : ViewModel() {
         //Calculate result
         val result = if (board[index] == BoardSquareState.HIDDEN) BoardSquareState.HIT
                      else BoardSquareState.MISSED
+
+        onResult(result)
 
         //Create updated board
         val temp = board.toMutableList()
