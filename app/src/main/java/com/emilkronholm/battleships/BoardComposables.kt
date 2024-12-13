@@ -32,9 +32,7 @@
 
         var selectedBoat : Ship? by remember { mutableStateOf(null) }
         var offset by remember { mutableStateOf(Coordinate(0, 0)) }
-        val invalidCoordinates = board.getListOfInvalidCoordinates()
-
-        var rect : Rect = Rect(0f, 0f, 0f, 0f)
+        var rect = Rect(0f, 0f, 0f, 0f)
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(10),
@@ -48,6 +46,7 @@
                 .pointerInput(Unit) {
                     awaitPointerEventScope {
 
+                        //True if player has moved a boat (between pointer down and up)
                         var hasMoved = false
 
                         while (true) {
@@ -76,13 +75,14 @@
                                     selectedBoat = null
                                 }
                                 event.changes.any { it.pressed } -> {
-                                    // Dragging gesture detected
+                                    // SELECT AND MOVE BOAT
                                     val x = (currentPosition.x / (rect.size.width / 10)).toInt()
                                     val y = (currentPosition.y / (rect.size.height / 10)).toInt()
                                     val coordinate = Coordinate(x, y)
 
 
-                                    if (selectedBoat != null && selectedBoat!!.parts[0].coordinate != coordinate + offset) {
+                                    if (selectedBoat != null &&
+                                        selectedBoat!!.parts[0].coordinate != coordinate + offset) {
                                         val newPos = coordinate.copy(
                                             x = (coordinate + offset).x.coerceIn(0, 9),
                                             y = (coordinate + offset).y.coerceIn(0, 9)
@@ -97,6 +97,7 @@
                                         onMove()
 
                                     } else {
+                                        //Select boat for moving
                                         val selectedShipInfo = board.getShipAt(coordinate)
                                         selectedBoat = selectedShipInfo?.ship
                                         if (selectedShipInfo != null) {
@@ -118,9 +119,6 @@
             items(100) { index ->
                 val coordinate = Coordinate(index%10, index/10)
                 val state = board.getState(coordinate)
-                val imageID =
-
-
                 GridItem(
                     imageID = if (state == BoardSquareState.HIDDEN) R.drawable.metal_tile
                             else R.drawable.water_tile,
