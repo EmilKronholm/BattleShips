@@ -166,7 +166,7 @@ class GameViewModel : ViewModel() {
 
         for (x in 0..9) {
             for (y in 0..9) {
-                list[10*x+y] = board.getState(Coordinate(x, y))
+                list[10*y+x] = board.getState(Coordinate(x, y))
             }
         }
         return list
