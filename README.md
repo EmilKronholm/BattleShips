@@ -14,5 +14,5 @@ If your friends dare to accept your challenge the game starts...
 *who can shoot down the other player's ships first?*
 
 # Battle your friends to see who the best player is!
-<img src="https://github.com/user-attachments/assets/38b4bafb-f0a3-45f6-8fb9-e4c3b528a418" width="300" height="700"/>
-<img src="https://github.com/user-attachments/assets/bd3b5001-49f2-4462-b394-0b9b45cc0fae" width="300" height="700"/>
+<img src="https://github.com/user-attachments/assets/38b4bafb-f0a3-45f6-8fb9-e4c3b528a418" width="300" height="600"/>
+<img src="https://github.com/user-attachments/assets/bd3b5001-49f2-4462-b394-0b9b45cc0fae" width="300" height="600"/>
