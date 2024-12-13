@@ -74,37 +74,42 @@ fun DynamicBackground(imageID: Int) {
 }
 
 @Composable
-fun BattleShipsApp() {
-    val navController = rememberNavController()
-    val playerViewModel: PlayerViewModel = viewModel()
+fun MusicPlayer(
+    musicResId: Int
+) {
     val context = LocalContext.current
-    val sharedPreferences =
-        LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
-
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
+    var currentMusic by remember { mutableIntStateOf(-1) }
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(Unit) {
-        playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
-        playerViewModel.localUserName = sharedPreferences.getString("playerName", null)
 
+    //When MusicPlayer is created
+    LaunchedEffect(musicResId) {
         if (mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(context, R.raw.maintheme).apply {
+            mediaPlayer = MediaPlayer.create(context, musicResId).apply {
                 isLooping = true
                 start()
+                currentMusic = musicResId
+            }
+        }
+
+        else if (musicResId != currentMusic) {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = MediaPlayer.create(context, musicResId).apply {
+                isLooping = true
+                start()
+                currentMusic = musicResId
             }
         }
     }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
+    //When MusicPlayer is killed
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_STOP -> {
-                    mediaPlayer?.pause()
-                }
-                Lifecycle.Event.ON_START -> {
-                    mediaPlayer?.start()
-                }
+                Lifecycle.Event.ON_STOP -> mediaPlayer?.pause()
+                Lifecycle.Event.ON_START -> mediaPlayer?.start()
                 else -> Unit
             }
         }
@@ -114,11 +119,6 @@ fun BattleShipsApp() {
 
         onDispose {
             lifecycle.removeObserver(observer)
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
             mediaPlayer?.apply {
                 stop()
                 release()
@@ -126,11 +126,34 @@ fun BattleShipsApp() {
             mediaPlayer = null
         }
     }
+}
 
 
+@Composable
+fun BattleShipsApp() {
+
+    // MusicPlayer is used here
+    var currentSong by remember { mutableIntStateOf(R.raw.lobbytheme) }
+    MusicPlayer(currentSong)
+
+    //Global background
+    var currentBackground by remember { mutableIntStateOf(R.drawable.nightbackground) }
+    DynamicBackground(currentBackground)
+
+    //Global viewModel (could be singleton)
+    val playerViewModel: PlayerViewModel = viewModel()
+    val sharedPreferences =
+        LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
+    LaunchedEffect(Unit) {
+        playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
+        playerViewModel.localUserName = sharedPreferences.getString("playerName", null)
+    }
+
+    //Create global NavHost
+    //Each route has a may can update the currentBackground
+    val navController = rememberNavController()
     NavHost(
         navController = navController,
-        //startDestination = "game/96Rgrm2x9U0fCaTByQTF",
         startDestination = Routes.HOME,
         enterTransition = { slideInHorizontally(initialOffsetX = { 1000 }) },
         exitTransition = { slideOutHorizontally(targetOffsetX = { -1000 }) },
@@ -138,26 +161,31 @@ fun BattleShipsApp() {
         popExitTransition = { slideOutHorizontally(targetOffsetX = { 1000 }) }
     ) {
         composable(Routes.HOME) {
-            DynamicBackground(R.drawable.nightbackground)
+            currentBackground = R.drawable.nightbackground
+            currentSong = R.raw.lobbytheme
             HomeScreen(navController, playerViewModel)
         }
         composable(Routes.ENTER_NAME) {
-            DynamicBackground(R.drawable.nightbackground)
+            currentBackground = R.drawable.nightbackground
+            currentSong = R.raw.lobbytheme
             EnterNameScreen(navController, playerViewModel)
         }
         composable(Routes.LOBBY) {
-            DynamicBackground(R.drawable.sunset)
+            currentBackground = R.drawable.sunset
+            currentSong = R.raw.lobbytheme
             LobbyScreen(navController, playerViewModel)
         }
 
         composable(Routes.PRE_GAME + "/{gameID}") { backStackEntry ->
             val gameID = backStackEntry.arguments?.getString("gameID") ?: ""
-            DynamicBackground(R.drawable.lighthouse)
+            currentBackground = R.drawable.lighthouse
+            currentSong = R.raw.maintheme
             PreGameScreen(navController, playerViewModel, gameID)
         }
         composable(Routes.GAME + "/{gameID}") { backStackEntry ->
             val gameID = backStackEntry.arguments?.getString("gameID") ?: ""
-            DynamicBackground(R.drawable.lighthouse)
+            currentBackground = R.drawable.lighthouse
+            currentSong = R.raw.maintheme
             GameScreen(navController, playerViewModel, gameID)
         }
     }
