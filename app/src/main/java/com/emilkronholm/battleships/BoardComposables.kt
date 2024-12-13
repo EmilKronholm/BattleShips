@@ -90,9 +90,7 @@
 
                                         hasMoved = true
                                         board.ships.remove(selectedBoat!!)
-                                        selectedBoat?.moveShipTo(newPos
-
-                                                + offset)
+                                        selectedBoat?.moveShipTo(newPos)
                                         board.ships.add(0, selectedBoat!!)
                                         onMove()
 
