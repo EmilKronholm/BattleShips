@@ -1,5 +1,6 @@
 package com.emilkronholm.battleships
 
+import android.media.MediaPlayer
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,11 +26,14 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -231,8 +235,23 @@ fun PopUp(
 
 @Composable
 fun ChallengePopup(challenges : Map<String, Challenge>, onlinePlayers: Map<String, Player>, challengeViewModel: ChallengeViewModel, gameViewModel: GameViewModel) {
+    val context = LocalContext.current
+    val plingSoundEffect = remember { MediaPlayer.create(context, R.raw.pling)}
+
+    LaunchedEffect (plingSoundEffect) {
+        plingSoundEffect.setVolume(1f, 1f)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            plingSoundEffect.release()
+        }
+    }
+
     challenges.forEach { challenge ->
         val playerName = onlinePlayers[challenge.value.challenger]?.name
+        plingSoundEffect.start()
+
         PopUp(
             title = "New challenge",
             message = "$playerName has challenged you to a game!",
