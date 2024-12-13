@@ -54,7 +54,6 @@ object Routes {
     const val LOBBY = "lobby"
     const val PRE_GAME = "pregame"
     const val GAME = "game"
-    const val POST_GAME = "game"
 }
 
 @Composable
@@ -160,11 +159,6 @@ fun BattleShipsApp() {
             val gameID = backStackEntry.arguments?.getString("gameID") ?: ""
             DynamicBackground(R.drawable.lighthouse)
             GameScreen(navController, playerViewModel, gameID)
-        }
-        composable(Routes.POST_GAME + "{result}") { backStackEntry ->
-            val result = backStackEntry.arguments?.getString("result") ?: ""
-            DynamicBackground(R.drawable.sunset)
-            PostGameScreen(navController, result == "win")
         }
     }
 }
