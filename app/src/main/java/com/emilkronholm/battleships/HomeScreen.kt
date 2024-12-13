@@ -2,7 +2,6 @@ package com.emilkronholm.battleships
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
@@ -17,13 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -31,13 +25,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
 
 val PixelFont = FontFamily(Font(R.font.pixel, FontWeight.Normal))
 
 @Composable
-fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, modifier: Modifier = Modifier) {
-    val sharedPreferences = LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
+fun HomeScreen(navController: NavController,
+               playerViewModel: PlayerViewModel,
+               modifier: Modifier = Modifier
+) {
+    val sharedPreferences =
+        LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
     var username : String? by remember { mutableStateOf(null) }
 
     LaunchedEffect(Unit) {
@@ -45,8 +42,6 @@ fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, m
         playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
         playerViewModel.localUserName = sharedPreferences.getString("playerName", null)
         username = playerViewModel.localUserName
-
-
     }
 
     Column(
@@ -93,7 +88,10 @@ fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, m
 
 
 @Composable
-fun EnterNameScreen(navController: NavController, playerViewModel: PlayerViewModel, modifier: Modifier = Modifier) {
+fun EnterNameScreen(navController: NavController,
+                    playerViewModel: PlayerViewModel,
+                    modifier: Modifier = Modifier
+) {
     var inputName by remember { mutableStateOf("") }
     val sharedPreferences = LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
 
