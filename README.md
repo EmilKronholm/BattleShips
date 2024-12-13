@@ -1,22 +1,12 @@
 # BattleShips
- Battleship project for Android course at JTH
+ Battleship project for Android course at JTH by Emil Kronholm.
+ Grade: 5 
 
-# IMPORTANT TODO
-- "Check for sunkships" in gamemodel
-- "Check for winner" in gamemodel 
-- Create PostGame Screen
-- 
+# What to do?
+Pick your favorite username and join the lobby where you can challenge your friends.
+If your friends dare to accept your challenge the game starts...
+*who can shoot down the other player's ships first?*
 
-# TODO
-- Better gameboard visuals
-- Drag and drop in pregame
-- Can move boats everywhere, but cannot be ready if not valid
-- Exit button on loading screen?
-
-# LONG TERM TODO
-- Implement transactions for challenges accepted/declined
-- Show red dot if occupied in other game?
-
-
-Weird bug if you ready too fast...?
-If you're fast, you can make two moves in one move...
+# Battle your friends to see who the best player is!
+<img src="https://github.com/user-attachments/assets/acff52b7-6ea0-46dc-8702-1f8e0e9cbd4f" width="300"/>
+<img src="https://github.com/user-attachments/assets/694bf431-9a13-4c20-b6a3-d095a35995a6" width="300"/>
