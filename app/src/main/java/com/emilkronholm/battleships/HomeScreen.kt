@@ -45,6 +45,8 @@ fun HomeScreen(navController: NavController, playerViewModel: PlayerViewModel, m
         playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
         playerViewModel.localUserName = sharedPreferences.getString("playerName", null)
         username = playerViewModel.localUserName
+
+
     }
 
     Column(
