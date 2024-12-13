@@ -126,6 +126,7 @@ class Board() {
     fun shuffle() {
         ships.clear()
         for (x in arrayOf(1, 1, 2, 2, 3, 4)) {
+//        for (x in arrayOf(1)) {
             while (true) {
                 val pos = Coordinate(Random.nextInt(0, 10), Random.nextInt(0, 10))
                 val newShip = Ship(pos, Random.nextInt(0, 2) % 2 == 0, x)
