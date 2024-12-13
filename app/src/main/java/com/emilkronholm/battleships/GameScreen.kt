@@ -128,7 +128,6 @@ fun GameScreenP(navController: NavController, gameViewModel: GameViewModel, game
     val isMyTurn = gameViewModel.isMyTurn()
     val isPlayer1 = gameViewModel.isPlayer1()
 
-    var board by remember { mutableStateOf(Board()) }
     var showResignPopUp by remember { mutableStateOf(false) }
 
     if (showResignPopUp) {
@@ -140,6 +139,7 @@ fun GameScreenP(navController: NavController, gameViewModel: GameViewModel, game
         })
     }
 
+    //Take care of BackHandler ourself
     BackHandler {
         showResignPopUp = !showResignPopUp
     }
