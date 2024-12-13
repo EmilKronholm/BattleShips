@@ -1,6 +1,7 @@
 package com.emilkronholm.battleships
 
 import android.annotation.SuppressLint
+import android.media.MediaPlayer
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -33,12 +33,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.util.packInts
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -92,9 +89,10 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
             val observer = LifecycleEventObserver { _, event ->
                 when (event) {
                     Lifecycle.Event.ON_STOP -> {
-                        if (requestedGame.gameState == GameState.PLAYER1_TURN ||
-                            requestedGame.gameState == GameState.PLAYER2_TURN)
+                        if (games[gameID]!!.gameState == GameState.PLAYER1_TURN ||
+                            games[gameID]!!.gameState == GameState.PLAYER2_TURN)
                         {
+                            println("PLAYER LEFT GAME")
                             gameViewModel.resignGame()
                         }
                     }
@@ -116,6 +114,15 @@ fun GameScreen(navController: NavController, playerViewModel: PlayerViewModel, g
 fun GameScreenP(navController: NavController, gameViewModel: GameViewModel, game: Game, title: String)
 {
     val context = LocalContext.current
+
+    val missSoundEffect = remember { MediaPlayer.create(context, R.raw.splash) }
+    val hitSoundEffect = remember { MediaPlayer.create(context, R.raw.boom) }
+    DisposableEffect(Unit) {
+        onDispose {
+            missSoundEffect.release()
+            hitSoundEffect.release()
+        }
+    }
 
     //Get state variables (for this recomposition)
     val isMyTurn = gameViewModel.isMyTurn()
@@ -164,6 +171,7 @@ fun GameScreenP(navController: NavController, gameViewModel: GameViewModel, game
         }
 
 
+
         PlayingGrid(
             gameViewModel,
             if (isPlayer1) game.board2 else game.board1,
@@ -174,6 +182,17 @@ fun GameScreenP(navController: NavController, gameViewModel: GameViewModel, game
                 if (isMyTurn) {
                     gameViewModel.makeMove(coordinate, onError = {
                         println("Something went wrong during move")
+                    },
+                    onResult = { state ->
+
+                        if (state == BoardSquareState.MISSED)
+                        {
+                            missSoundEffect.start()
+                        } else if (state == BoardSquareState.HIT) {
+                            hitSoundEffect.start()
+                        }
+
+
                     })
                 } else {
                     Toast.makeText(
