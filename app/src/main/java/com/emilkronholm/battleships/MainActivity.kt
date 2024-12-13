@@ -22,6 +22,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -32,6 +33,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 
@@ -41,7 +46,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             BattleShipsTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(modifier = Modifier.fillMaxSize()) { _ ->
                     BattleShipsApp()
                 }
             }
@@ -78,48 +83,57 @@ fun DynamicBackground(imageID: Int) {
 @Composable
 fun BattleShipsApp() {
     val navController = rememberNavController()
-    val playerViewModel = PlayerViewModel()
+    val playerViewModel: PlayerViewModel = viewModel()
     val context = LocalContext.current
-    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
     val sharedPreferences =
         LocalContext.current.getSharedPreferences("TicTacToePrefs", Context.MODE_PRIVATE)
+
+    var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
 
     LaunchedEffect(Unit) {
         playerViewModel.localUserID = sharedPreferences.getString("playerId", null).toString()
         playerViewModel.localUserName = sharedPreferences.getString("playerName", null)
-    }
 
-    val updateMediaPlayer: (Int) -> Unit = { newSoundResId ->
-        mediaPlayer?.let {
-            if (it.isPlaying) it.stop()
-            it.release()
-        }
-        mediaPlayer = MediaPlayer.create(context, newSoundResId).apply {
-            isLooping = true
-            start()
-        }
-    }
-
-    LaunchedEffect(navController) {
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            when (destination.route) {
-                Routes.HOME -> updateMediaPlayer(R.raw.lobbytheme)
-                Routes.LOBBY -> updateMediaPlayer(R.raw.lobbytheme)
-                "${Routes.PRE_GAME}/{gameID}" -> updateMediaPlayer(R.raw.maintheme)
-                "${Routes.GAME}/{gameID}" -> updateMediaPlayer(R.raw.maintheme)
-                "${Routes.POST_GAME}{result}" -> updateMediaPlayer(R.raw.lobbytheme)
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(context, R.raw.maintheme).apply {
+                isLooping = true
+                start()
             }
+        }
+    }
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_STOP -> {
+                    mediaPlayer?.pause()
+                }
+                Lifecycle.Event.ON_START -> {
+                    mediaPlayer?.start()
+                }
+                else -> Unit
+            }
+        }
+
+        val lifecycle = lifecycleOwner.lifecycle
+        lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycle.removeObserver(observer)
         }
     }
 
     DisposableEffect(Unit) {
         onDispose {
-            mediaPlayer?.let {
-                if (it.isPlaying) it.stop()
-                it.release()
+            mediaPlayer?.apply {
+                stop()
+                release()
             }
+            mediaPlayer = null
         }
     }
+
 
     NavHost(
         navController = navController,
