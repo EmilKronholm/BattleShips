@@ -1,6 +1,6 @@
 # BattleShips
  Battleship project for Android course at JTH by Emil Kronholm.
- This project aspires to achieve grade 5.
+ Grade: 5 
 
 # What to do?
 Pick your favorite username and join the lobby where you can challenge your friends.
