@@ -83,9 +83,16 @@
 
 
                                     if (selectedBoat != null && selectedBoat!!.parts[0].coordinate != coordinate + offset) {
+                                        val newPos = coordinate.copy(
+                                            x = (coordinate + offset).x.coerceIn(0, 9),
+                                            y = (coordinate + offset).y.coerceIn(0, 9)
+                                        )
+
                                         hasMoved = true
                                         board.ships.remove(selectedBoat!!)
-                                        selectedBoat?.moveShipTo(coordinate + offset)
+                                        selectedBoat?.moveShipTo(newPos
+
+                                                + offset)
                                         board.ships.add(0, selectedBoat!!)
                                         onMove()
 
