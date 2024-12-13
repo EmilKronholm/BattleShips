@@ -1,7 +1,6 @@
 package com.emilkronholm.battleships
 
 import android.media.MediaPlayer
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,17 +9,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.HorizontalDivider
@@ -59,6 +55,7 @@ fun LobbyScreen(navController: NavController, playerViewModel: PlayerViewModel, 
         gameViewModel.startScanForGames(playerViewModel.localUserID)
     }
 
+    //Iterate through all challenges (when updated) and display all popups
     ChallengePopup(challenges, onlinePlayers, challengeViewModel, gameViewModel)
 
     LaunchedEffect(games) {
@@ -69,8 +66,6 @@ fun LobbyScreen(navController: NavController, playerViewModel: PlayerViewModel, 
             }
         }
     }
-
-
 
     Column(
         modifier = Modifier
@@ -139,7 +134,7 @@ fun InviteRow(player: Player, modifier: Modifier = Modifier, onClick : () -> Uni
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(player.name, color = Color.White)
+        Text(player.name, color = Color.White, fontFamily = PixelFont, fontSize = 25.sp)
         Spacer(modifier = Modifier.weight(1f)) // Spacer expands to push the button to the right
         Button(
             onClick = {
@@ -162,6 +157,7 @@ fun InviteRow(player: Player, modifier: Modifier = Modifier, onClick : () -> Uni
     }
 }
 
+//TODO(): PopUp is used as global object, move it to a more appropiate file
 @Composable
 fun PopUp(
     title: String,
@@ -171,7 +167,6 @@ fun PopUp(
     isPrompt: Boolean = true
 ) {
     Dialog(onDismissRequest = { onDismiss() }) {
-        // The popup content
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -199,8 +194,6 @@ fun PopUp(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.align(Alignment.Start)
                 ) {
-
-
                     Button(
                         onClick = { onConfirm() },
                         colors = ButtonColors(
@@ -264,44 +257,8 @@ fun ChallengePopup(challenges : Map<String, Challenge>, onlinePlayers: Map<Strin
                 // Accept the challenge
                 challengeViewModel.acceptChallenge(challenge.key)
                 gameViewModel.createGame(challenge.value.recipient, challenge.value.challenger)
-//                gameViewModel.startScanForGames(challenge.value.recipient)
             }
         )
     }
 
 }
-
-//@Composable
-//fun ChallengePopup(challenges : Map<String, Challenge>, onlinePlayers: Map<String, Player>, challengeViewModel: ChallengeViewModel, gameViewModel: GameViewModel) {
-//    challenges.forEach { challenge ->
-//        AlertDialog(
-//            onDismissRequest = {
-//                challengeViewModel.declineChallenge(
-//                    challenge.key
-//                )
-//            },
-//            title = { Text("New Challenge!") },
-//            text = {
-//                val playerName = onlinePlayers[challenge.value.challenger]?.name
-//                Text("$playerName has challenged you to a game!")
-//            },
-//            confirmButton = {
-//                Button(onClick = {
-//                    // Accept the challenge
-//                    challengeViewModel.acceptChallenge(challenge.key)
-//                    gameViewModel.createGame(challenge.value.recipient, challenge.value.challenger)
-//                    gameViewModel.startScanForGames(challenge.value.recipient)
-//                }) {
-//                    Text("Accept")
-//                }
-//            },
-//            dismissButton = {
-//                Button(onClick = {
-//                    challengeViewModel.declineChallenge(challenge.key)
-//                }) {
-//                    Text("Decline")
-//                }
-//            }
-//        )
-//    }
-//}
