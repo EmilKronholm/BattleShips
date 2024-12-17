@@ -179,7 +179,8 @@ class GameViewModel : ViewModel() {
         val visited = mutableSetOf<Int>() // Tracks indices we've already processed
 
         fun dfs(index: Int, currentShip: MutableList<Int>) {
-            if (index in visited || list[index] != BoardSquareState.HIT && list[index] != BoardSquareState.HIDDEN) return
+            if (index in visited || list[index] != BoardSquareState.HIT
+                && list[index] != BoardSquareState.HIDDEN) return
             visited.add(index)
             currentShip.add(index)
 
@@ -195,7 +196,8 @@ class GameViewModel : ViewModel() {
         }
 
         for (i in list.indices) {
-            if (i in visited || list[i] != BoardSquareState.HIT && list[i] != BoardSquareState.HIDDEN) continue
+            if (i in visited || list[i] != BoardSquareState.HIT
+                && list[i] != BoardSquareState.HIDDEN) continue
 
             val currentShip = mutableListOf<Int>()
             dfs(i, currentShip)
