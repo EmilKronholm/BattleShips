@@ -142,8 +142,6 @@ class GameEngine {
                 "gameState" to gameState,
                 boardFieldName to board
             ))
-
-
     }
 
     fun uploadBoard(gameID:String, isPlayer1: Boolean, list: List<BoardSquareState>) {
